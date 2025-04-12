@@ -1,26 +1,180 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===== TRICOLOR THEME ELEMENTS ===== */
+/* Used in HeroSection, Navbar, and other components with Indian flag colors */
+.tricolor-stripe {
+    overflow: hidden;
+}
+.tricolor-saffron {
+    background: #FF9933;
+    animation: saffron-pulse 3s infinite;
+}
+.tricolor-white {
+    background: #FFFFFF;
+    animation: white-pulse 3s infinite 0.5s;
+}
+.tricolor-green {
+    background: #138808;
+    animation: green-pulse 3s infinite 1s;
+}
+  
+@keyframes saffron-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+@keyframes white-pulse {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+}
+@keyframes green-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+  
+/* ===== LOGO AND BADGE ANIMATIONS ===== */
+/* Used in Navbar and HeroSection components */
+.logo-badge {
+    animation: bounce 2s infinite;
+}
+  
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+  
+/* ===== EMOJI ANIMATIONS ===== */
+/* Used in HeroSection and FeaturesSection for floating emoji elements */
+.emoji-float {
+    animation: float 6s ease-in-out infinite;
+}
+  
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+  
+/* ===== FORM ELEMENT STYLES ===== */
+/* Used in HeroSection search and VoiceAssistant component */
+.input-field:focus {
+    box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.3);
+}
+  
+/* ===== VOICE BUTTON ANIMATIONS ===== */
+/* Used in HeroSection and VoiceAssistant components */
+.voice-btn.animate-pulse {
+    animation: pulse 1.5s infinite;
+}
+  
+@keyframes pulse {
+    0% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.1); }
+    100% { transform: translateY(-50%) scale(1); }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ===== CARD AND ELEMENT EFFECTS ===== */
+/* Used in FeaturesSection and other card components */
+.card-glow {
+  box-shadow: 0 0 15px rgba(255, 153, 51, 0.5);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ===== FALLBACK STYLES ===== */
+/* Browser compatibility fallbacks */
+@supports not (-webkit-background-clip: text) {
+  .gradient-text {
+    color: #FF9933;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===== TRANSITION EFFECTS ===== */
+/* Used in FeaturesSection cards and interactive elements */
+.feature-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+/* Mobile-specific styles for better UX on small screens */
+@media (max-width: 767px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ===== ACCESSIBILITY FOCUS STATES ===== */
+/* Improved focus indicators for keyboard navigation */
+button:focus-visible {
+  outline: 2px solid #FF9933;
+  outline-offset: 2px;
+}
+
+/* ===== CUSTOM ANIMATIONS ===== */
+/* Used across multiple components including FeaturesSection */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite ease-in-out;
+}
+
+@keyframes spin-slow {
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 6s linear infinite;
+}
+
+/* Bounce animation used in multiple components */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+/* Fade-in animation for search results in HeroSection */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 1s ease-in;
+}
+
+/* ===== COLOR VARIABLES ===== */
+/* Global color scheme used throughout the application */
+:root {
+  --saffron: #FF9933;
+  --green: #138808;
+  --primary: #1E88E5;
+}
+
+/* ===== PULSE ANIMATION ===== */
+/* Used in multiple components for attention-grabbing effects */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-pulse {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* ===== UI COMPONENT STYLES ===== */
+/* Common UI element styles */
+.rounded-button {
+  border-radius: 0.5rem;
+}
+
+/* ===== ERROR STATES ===== */
+/* Used in VoiceAssistant for error messages */
+.voice-error {
+  color: #e53e3e;
+  background-color: #fef2f2;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  margin-top: 0.5rem;
 }
