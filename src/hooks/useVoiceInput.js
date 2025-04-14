@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export default function useVoiceInput({ language = 'hi-IN' } = {}) {
+export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 3000 } = {}) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState(null);
   const [error, setError] = useState(null);
+  const [lastSpeechTimestamp, setLastSpeechTimestamp] = useState(null);
+  const [silenceTimer, setSilenceTimer] = useState(null);
 
   // Initialize SpeechRecognition with memoized callback
   const initializeRecognition = useCallback(() => {
@@ -43,7 +45,29 @@ export default function useVoiceInput({ language = 'hi-IN' } = {}) {
         }
       }
 
+      // Update transcript
       setTranscript((prev) => (finalTranscript || interimTranscript || prev).trim());
+      
+      // Reset silence detection on speech
+      setLastSpeechTimestamp(Date.now());
+      
+      // Clear any existing silence timer
+      if (silenceTimer) {
+        clearTimeout(silenceTimer);
+      }
+      
+      // Set a new silence timer
+      const timer = setTimeout(() => {
+        const now = Date.now();
+        const lastSpeech = lastSpeechTimestamp;
+        
+        if (lastSpeech && (now - lastSpeech > silenceTimeout) && isListening) {
+          console.log('Silence detected, stopping recognition');
+          stopListening();
+        }
+      }, silenceTimeout);
+      
+      setSilenceTimer(timer);
     };
 
     recognitionInstance.onerror = (event) => {
@@ -58,9 +82,6 @@ export default function useVoiceInput({ language = 'hi-IN' } = {}) {
 
     recognitionInstance.onend = () => {
       setIsListening(false);
-      if (!error) {
-        recognitionInstance.start(); 
-      }
     };
 
     setRecognition(recognitionInstance);
@@ -73,7 +94,12 @@ export default function useVoiceInput({ language = 'hi-IN' } = {}) {
     return () => {
       if (recognition) {
         recognition.stop();
-        recognition.onend = null; 
+        recognition.onend = null;
+      }
+      
+      // Clear any silence detection timer
+      if (silenceTimer) {
+        clearTimeout(silenceTimer);
       }
     };
   }, [initializeRecognition]);
@@ -94,13 +120,20 @@ export default function useVoiceInput({ language = 'hi-IN' } = {}) {
   const stopListening = useCallback(() => {
     if (recognition && isListening) {
       try {
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          setSilenceTimer(null);
+        }
+        
+        // Stop the recognition
         recognition.stop();
+        setIsListening(false);
       } catch (err) {
         console.error('Failed to stop recognition:', err);
         setError('Failed to stop voice input.');
       }
     }
-  }, [recognition, isListening]);
+  }, [recognition, isListening, silenceTimer]);
 
   // Reset Transcript
   const resetTranscript = useCallback(() => {

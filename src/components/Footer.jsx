@@ -73,27 +73,27 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-[#FF9933]">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Sarkari Babu Mode
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Auto-Form Filler
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Gaon Connect
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Paise Bachao Tips
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Emergency Alerts
                 </Link>
               </li>
@@ -110,27 +110,27 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-[#FF9933]">Company</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/about" className="text-gray-400 hover:text-[#138808] transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/careers" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Careers
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/privacy-policy" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/terms-of-service" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-[#138808] transition-colors">
+                <Link href="/contact" className="text-gray-400 hover:text-[#138808] transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -148,12 +148,42 @@ export default function Footer() {
             <p className="text-gray-400 mb-4">
               Stay updated with our latest features and announcements.
             </p>
-            <form className="flex flex-col sm:flex-row gap-2">
+            <form 
+              className="flex flex-col sm:flex-row gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const email = e.target.email.value;
+                if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                  // Show error for invalid email
+                  const errorMsg = document.getElementById('errorMessage');
+                  errorMsg.style.opacity = 1;
+                  setTimeout(() => {
+                    errorMsg.style.opacity = 0;
+                  }, 3000);
+                  return;
+                }
+                
+                // Here you would typically send the email to your backend
+                // For now, we'll just show the success message
+                const successMsg = document.getElementById('successMessage');
+                successMsg.style.opacity = 1;
+                
+                // Reset form
+                e.target.reset();
+                
+                // Hide success message after 3 seconds
+                setTimeout(() => {
+                  successMsg.style.opacity = 0;
+                }, 3000);
+              }}
+            >
               <motion.input
                 whileFocus={{ scale: 1.02 }}
                 type="email"
+                name="email"
                 placeholder="Your email"
                 className="px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#138808] bg-gray-800 text-white placeholder-gray-500"
+                required
               />
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -164,12 +194,21 @@ export default function Footer() {
                 Subscribe
               </motion.button>
             </form>
+            {/* Error Message */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              className="text-red-400 mt-2 text-sm"
+              id="errorMessage"
+              style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
+            >
+              Please enter a valid email address.
+            </motion.p>
             {/* Success Message  */}
             <motion.p
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0 }}
               className="text-green-400 mt-2 text-sm"
               id="successMessage"
+              style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
             >
               Thanks for subscribing! 🎉
             </motion.p>

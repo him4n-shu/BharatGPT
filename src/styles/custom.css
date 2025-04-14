@@ -161,6 +161,18 @@
   100% { height: 5px; }
 }
 
+/* Microphone button animation */
+.hero-voice-btn.listening {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  animation: mic-pulse 1.5s infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
 /* Form input focus styles with tricolor glow */
 .form-input-focus {
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -327,7 +339,7 @@
   left: -10%;
   width: 40%;
   aspect-ratio: 1;
-  background: #FF9933; /* Saffron */
+  background: #FF9933; 
   animation: float-1 12s infinite alternate;
 }
 
@@ -336,8 +348,31 @@
   right: -10%;
   width: 40%;
   aspect-ratio: 1;
-  background: #138808; /* Green */
+  background: #138808; 
   animation: float-2 15s infinite alternate;
+}
+
+/* Voice Input Styles */
+.hero-voice-btn {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hero-voice-btn.listening {
+  color: #FF9933; 
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 153, 51, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 153, 51, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 153, 51, 0);
+  }
 }
 
 /* Container */

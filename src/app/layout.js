@@ -2,6 +2,7 @@ import { Inter, Poppins } from 'next/font/google';
 import './globals.css';
 import '../styles/custom.css';
 import '../styles/hero-animations.css';
+import '../styles/search-results.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 

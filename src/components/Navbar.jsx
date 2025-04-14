@@ -9,6 +9,8 @@ export default function Navbar() {
   const [language, setLanguage] = useState('en');
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // scroll effect
   useEffect(() => {
@@ -16,6 +18,44 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = document.querySelector('.user-dropdown');
+      const button = document.querySelector('.user-dropdown-button');
+      if (showDropdown && dropdown && !dropdown.contains(event.target) && !button.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+  
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setShowDropdown(false);
+    window.location.href = '/';
+  };
 
   // Animation variants
   const menuVariants = {
@@ -112,18 +152,58 @@ export default function Navbar() {
                   </Link>
                 </motion.div>
               ))}
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href="/get-started"
-                  className="cta-button"
-                  style={{
-                    background: 'linear-gradient(to right, #FF9933, #138808)',
-                  }}
-                  aria-label="Get Started"
+              {user ? (
+                <motion.div 
+                  className="relative flex items-center"
                 >
-                  Get Started
-                </Link>
-              </motion.div>
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="cta-button flex items-center user-dropdown-button"
+                    style={{
+                      background: 'linear-gradient(to right, #FF9933, #138808)',
+                    }}
+                    aria-label="User menu"
+                    aria-expanded={showDropdown}
+                  >
+                    <span>{user.name}</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {/* User dropdown menu */}
+                  {showDropdown && (
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200 user-dropdown">
+                      <Link 
+                        href="/profile" 
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button 
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href="/get-started"
+                    className="cta-button"
+                    style={{
+                      background: 'linear-gradient(to right, #FF9933, #138808)',
+                    }}
+                    aria-label="Get Started"
+                  >
+                    Get Started
+                  </Link>
+                </motion.div>
+              )}
             </div>
           </div>
 
@@ -183,19 +263,52 @@ export default function Navbar() {
                     </Link>
                   </motion.div>
                 ))}
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="/get-started"
-                    className="cta-button block text-center"
-                    style={{
-                      background: 'linear-gradient(to right, #FF9933, #138808)',
-                    }}
-                    onClick={() => setIsMenuOpen(false)}
-                    aria-label="Get Started"
-                  >
-                    Get Started
-                  </Link>
-                </motion.div>
+                {user ? (
+                  <>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Link
+                        href="/profile"
+                        className="cta-button block text-center"
+                        style={{
+                          background: 'linear-gradient(to right, #FF9933, #138808)',
+                        }}
+                        onClick={() => setIsMenuOpen(false)}
+                        aria-label="View Profile"
+                      >
+                        {user.name}
+                      </Link>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="mt-2">
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMenuOpen(false);
+                        }}
+                        className="cta-button block text-center w-full"
+                        style={{
+                          background: '#e53e3e',
+                        }}
+                        aria-label="Logout"
+                      >
+                        Logout
+                      </button>
+                    </motion.div>
+                  </>
+                ) : (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Link
+                      href="/get-started"
+                      className="cta-button block text-center"
+                      style={{
+                        background: 'linear-gradient(to right, #FF9933, #138808)',
+                      }}
+                      onClick={() => setIsMenuOpen(false)}
+                      aria-label="Get Started"
+                    >
+                      Get Started
+                    </Link>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           )}

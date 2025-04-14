@@ -13,7 +13,7 @@ export default function Home() {
       <HeroSection />
       <FeaturesSection />
       
-      <section className="py-16 bg-light-gray">
+      <section id="services" className="py-16 bg-light-gray">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-12 text-dark-gray">
             <span className="text-primary">Bharat</span>
