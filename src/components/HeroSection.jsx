@@ -66,7 +66,7 @@ export default function HeroSection() {
   // Handle search submission
   const handleSearch = (e) => {
     if (e) e.preventDefault();
-    console.log('Searching for:', query);t
+    console.log('Searching for:', query);
   };
 
   return (
