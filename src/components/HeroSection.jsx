@@ -9,6 +9,8 @@ export default function HeroSection() {
   const [query, setQuery] = useState('');
   const [currentSuggestion, setCurrentSuggestion] = useState(0);
   const [voiceError, setVoiceError] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { isListening, startListening, stopListening, transcript, error, resetTranscript } = useVoiceInput();
 
   // Auto-rotate suggestions
@@ -64,9 +66,36 @@ export default function HeroSection() {
   ];
 
   // Handle search submission
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     if (e) e.preventDefault();
-    console.log('Searching for:', query);
+    if (!query.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/gpt4', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch results');
+      }
+
+      const data = await response.json();
+      setSearchResults(data.results || []);
+    } catch (error) {
+      console.error('Error fetching results:', error);
+      setSearchResults([{
+        title: 'Error',
+        content: 'Sorry, we encountered an error while processing your request. Please try again.',
+        link: null
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -188,40 +217,97 @@ export default function HeroSection() {
               <div className="hero-search-results-emoji">🇮🇳</div>
             </div>
             
-            {query ? (
+            {isLoading ? (
+              <div className="hero-search-results-placeholder">
+                <motion.div 
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  className="hero-search-results-placeholder-icon"
+                >
+                  <FaSearch className="text-4xl text-gray-400" />
+                </motion.div>
+                <p>Searching for answers...</p>
+              </div>
+            ) : query ? (
               <div className="hero-search-results-content">
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="hero-search-result-item"
-                >
-                  <h3>Ration Card Application</h3>
-                  <p>Visit your nearest PDS office with Aadhaar card, residence proof, and family photo.</p>
-                  <a href="#" className="hero-search-result-link">View Details</a>
-                </motion.div>
-                
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="hero-search-result-item"
-                >
-                  <h3>Online Application Portal</h3>
-                  <p>Apply online through the official government portal for faster processing.</p>
-                  <a href="#" className="hero-search-result-link">Visit Portal</a>
-                </motion.div>
-                
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="hero-search-result-item"
-                >
-                  <h3>Required Documents</h3>
-                  <p>List of all documents needed for your application process.</p>
-                  <a href="#" className="hero-search-result-link">Download Checklist</a>
-                </motion.div>
+                {searchResults.length > 0 ? (
+                  <div className="results-section">
+                    {searchResults.map((result, index) => (
+                      <motion.div 
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.2 }}
+                        className="hero-search-result-item"
+                      >
+                        <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                          {typeof result.title === 'string' ? result.title : JSON.stringify(result.title)}
+                        </h3>
+                        <div 
+                          className="prose prose-sm max-w-none mb-4 text-gray-600 bg-white rounded-lg p-6 shadow-sm"
+                          style={{ 
+                            width: '100%',
+                            height: 'auto',
+                            position: 'relative',
+                            zIndex: 1
+                          }}
+                        >
+                          {result.content.split('\n').map((line, i) => {
+                            if (!line.trim()) return null;
+                            
+                            const isMainPoint = /^\d+\./.test(line);
+                            const isBulletPoint = line.trim().startsWith('-') || line.trim().startsWith('•');
+                            
+                            return (
+                              <div 
+                                key={i}
+                                className={`content-item ${isBulletPoint ? 'ml-6' : ''} ${isMainPoint ? 'main-point' : ''}`}
+                                style={{
+                                  backgroundColor: 'white',
+                                  padding: isMainPoint ? '1rem' : '0.5rem',
+                                  borderRadius: '0.5rem',
+                                  marginTop: isMainPoint ? '1rem' : '0.25rem',
+                                  boxShadow: isMainPoint ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                                  borderLeft: isBulletPoint ? '2px solid #e5e7eb' : 'none'
+                                }}
+                              >
+                                {isMainPoint ? (
+                                  <strong className="text-lg text-gray-800 block">
+                                    {line}
+                                  </strong>
+                                ) : isBulletPoint ? (
+                                  <div className="flex items-start">
+                                    <span className="mr-2 text-gray-400">•</span>
+                                    <span>{line.replace(/^[-•]\s*/, '')}</span>
+                                  </div>
+                                ) : (
+                                  <span>{line}</span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {result.link && (
+                          <a 
+                            href={result.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-blue-600 hover:text-blue-800 mt-2"
+                          >
+                            <span>Official Website</span>
+                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="hero-search-results-placeholder">
+                    <p>No results found. Try a different query.</p>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="hero-search-results-placeholder">
