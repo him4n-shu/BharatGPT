@@ -49,7 +49,7 @@ export default function TermsOfService() {
             >
               <h2 className="text-2xl font-bold mb-4 text-gray-800">Acceptance of Terms</h2>
               <p className="text-gray-600 mb-4">
-                By accessing or using BharatGPT ("we," "our," or "us"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
+                By accessing or using BharatGPT (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
               </p>
               <p className="text-gray-600">
                 These Terms of Service govern your use of our website and services. Please read them carefully before using our platform.

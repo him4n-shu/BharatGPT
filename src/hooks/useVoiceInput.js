@@ -21,15 +21,15 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
     }
 
     const recognitionInstance = new SpeechRecognition();
-    recognitionInstance.continuous = true; 
-    recognitionInstance.interimResults = true; 
-    recognitionInstance.lang = language; 
-    recognitionInstance.maxAlternatives = 1; 
+    recognitionInstance.continuous = true;
+    recognitionInstance.interimResults = true;
+    recognitionInstance.lang = language;
+    recognitionInstance.maxAlternatives = 1;
 
     // Event Handlers
     recognitionInstance.onstart = () => {
       setIsListening(true);
-      setError(null); 
+      setError(null);
     };
 
     recognitionInstance.onresult = (event) => {
@@ -63,7 +63,8 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
         
         if (lastSpeech && (now - lastSpeech > silenceTimeout) && isListening) {
           console.log('Silence detected, stopping recognition');
-          stopListening();
+          recognition.stop();
+          setIsListening(false);
         }
       }, silenceTimeout);
       
