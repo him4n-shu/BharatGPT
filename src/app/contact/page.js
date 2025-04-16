@@ -91,7 +91,7 @@ export default function Contact() {
             </h1>
             <div className="w-32 h-1 bg-gradient-to-r from-saffron to-green-700 mx-auto rounded"></div>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">
-              Got questions about BharatGPT? We're just a message away!
+              Got questions about BharatGPT? We&apos;re just a message away!
             </p>
           </motion.div>
 

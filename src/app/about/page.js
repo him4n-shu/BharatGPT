@@ -93,7 +93,7 @@ export default function About() {
               Contact Us
             </h2>
             <p className="text-gray-600 mb-6">
-              Have questions or suggestions? We'd love to hear from you!
+              Have questions or suggestions? We&apos;d love to hear from you!
             </p>
             <a 
               href="/contact" 

@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
             >
               <h2 className="text-2xl font-bold mb-4 text-gray-800">Introduction</h2>
               <p className="text-gray-600 mb-4">
-                BharatGPT ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.
+                BharatGPT (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.
               </p>
               <p className="text-gray-600">
                 We respect your privacy and are committed to protecting it through our compliance with this policy. Please read this policy carefully to understand our policies and practices regarding your information.
