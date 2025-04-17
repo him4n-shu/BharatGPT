@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
-import bcrypt from 'bcryptjs';
+// app/api/login/route.js
 
-// MongoDB Connection URI
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bharatgpt';
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import clientPromise from '@/lib/mongodb';
+import { generateToken } from '@/lib/jwt';
 
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
 
-    // Validate input
+    // Basic validation
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -17,49 +17,46 @@ export async function POST(request) {
       );
     }
 
-    // Connect to MongoDB
-    const client = new MongoClient(uri);
-    await client.connect();
-    
+    const client = await clientPromise;
     const db = client.db('bharatgpt');
     const usersCollection = db.collection('users');
 
-    // Find user by email
-    const user = await usersCollection.findOne({ email });
-    
-    // Check if user exists
+    // Normalize and check email
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await usersCollection.findOne({ email: normalizedEmail });
+
     if (!user) {
-      await client.close();
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // Verify password
+    // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      await client.close();
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    await client.close();
+    // Prepare user data without sensitive fields
+    const { password: _, _id, ...userWithoutPassword } = user;
 
-    // Return user data (excluding password)
-    const { password: _, ...userWithoutPassword } = user;
-    
+    // Generate JWT token
+    const token = generateToken(userWithoutPassword);
+
     return NextResponse.json(
-      { 
-        message: 'Login successful', 
+      {
+        message: 'Login successful',
         user: userWithoutPassword,
+        token
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error:', error.message);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
