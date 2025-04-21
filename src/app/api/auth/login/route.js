@@ -6,6 +6,7 @@ import clientPromise from '@/lib/mongodb';
 import { generateToken } from '@/lib/jwt';
 
 export async function POST(request) {
+  let client;
   try {
     const { email, password } = await request.json();
 
@@ -17,13 +18,23 @@ export async function POST(request) {
       );
     }
 
-    const client = await clientPromise;
+    // Get MongoDB client with timeout
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+    );
+    
+    client = await Promise.race([clientPromise, timeoutPromise]);
     const db = client.db('bharatgpt');
     const usersCollection = db.collection('users');
 
     // Normalize and check email
     const normalizedEmail = email.toLowerCase().trim();
-    const user = await usersCollection.findOne({ email: normalizedEmail });
+    
+    // Use projection to only fetch needed fields
+    const user = await usersCollection.findOne(
+      { email: normalizedEmail },
+      { projection: { email: 1, password: 1, name: 1 } }
+    );
 
     if (!user) {
       return NextResponse.json(
@@ -32,8 +43,13 @@ export async function POST(request) {
       );
     }
 
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Check password with timeout
+    const passwordPromise = bcrypt.compare(password, user.password);
+    const isPasswordValid = await Promise.race([
+      passwordPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Password verification timeout')), 3000))
+    ]);
+
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
@@ -66,7 +82,21 @@ export async function POST(request) {
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error:', error.message);
+
+    if (error.message === 'Database connection timeout') {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable. Please try again.' },
+        { status: 503 }
+      );
+    }
+
+    if (error.message === 'Password verification timeout') {
+      return NextResponse.json(
+        { error: 'Request timeout. Please try again.' },
+        { status: 504 }
+      );
+    }
 
     // Check if it's a JSON parsing error
     if (error instanceof SyntaxError && error.message.includes('JSON')) {
