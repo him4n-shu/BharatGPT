@@ -16,8 +16,6 @@ const options = {
   serverSelectionTimeoutMS: 10000,
   ssl: true,
   tls: true,
-  tlsCAFile: undefined,
-  directConnection: true,
   retryWrites: true,
   w: 'majority'
 };
