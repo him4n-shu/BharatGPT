@@ -237,3 +237,96 @@ button:focus-visible {
   overflow: visible;
   margin-bottom: 0.5rem;
 }
+
+/* Scheme Response Styling */
+.scheme-response h3 {
+  font-size: 1.75rem;
+  background: linear-gradient(to right, #FF9933, #138808);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.scheme-response h4 {
+  font-size: 1.25rem;
+  color: #138808;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.scheme-response h4::before {
+  content: '';
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #FF9933;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+}
+
+.scheme-response strong {
+  color: #FF9933;
+  font-weight: 600;
+}
+
+.scheme-response ul {
+  list-style-type: none;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ul li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ul li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #FF9933;
+}
+
+.scheme-response ol {
+  list-style-type: none;
+  counter-reset: custom-counter;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ol li {
+  position: relative;
+  counter-increment: custom-counter;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ol li::before {
+  content: counter(custom-counter);
+  position: absolute;
+  left: 0;
+  font-weight: 600;
+  color: #138808;
+}
+
+.scheme-response [style*="background-color"] {
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.scheme-response a {
+  color: #FF9933;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px dotted #FF9933;
+}
+
+.scheme-response a:hover {
+  color: #138808;
+  border-bottom-color: #138808;
+}

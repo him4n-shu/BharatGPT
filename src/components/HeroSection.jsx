@@ -1,32 +1,71 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaMicrophone, FaMicrophoneSlash, FaSearch } from 'react-icons/fa';
-import { RiGovernmentFill } from 'react-icons/ri';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+import { RiSendPlaneFill} from 'react-icons/ri';
 import useVoiceInput from '../hooks/useVoiceInput';
 
 export default function HeroSection() {
   const [query, setQuery] = useState('');
   const [currentSuggestion, setCurrentSuggestion] = useState(0);
   const [voiceError, setVoiceError] = useState(null);
-  const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { isListening, startListening, stopListening, transcript, error, resetTranscript } = useVoiceInput();
+  
+  // Sample suggestions for the input field
+  const suggestions = [
+    "What are the major festivals of India?",
+    "Tell me about Indian classical music",
+    "Explain the significance of the Taj Mahal",
+    "What are popular Indian dishes?",
+    "Tell me about India's space program"
+  ];
+
+  // User information
+  const [username, setUsername] = useState('');
+
+  // Get user data from localStorage
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUsername(parsedUser.name);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        setUsername('Guest');
+      }
+    } else {
+      setUsername('Guest');
+    }
+  }, []);
+  
+  // Chat related state
+  const [chatMessages, setChatMessages] = useState([
+    {
+      role: 'bot',
+      content: `Good evening! नमस्ते!<br/><span class="text-gray-500">How can I help you today?</span>`,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+  ]);
+  const chatContainerRef = useRef(null);
+  const inputRef = useRef(null);
 
   // Auto-rotate suggestions
   useEffect(() => {
+    if (suggestions.length === 0) return; // Guard clause if no suggestions
     const interval = setInterval(() => {
       setCurrentSuggestion((prev) => (prev + 1) % suggestions.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  const suggestions = [
-    "How to apply for a ration card?",
-    "10वीं का सर्टिफिकेट खो गया है",
-    "LPG subsidy status check",
-    "आंगनवाड़ी फॉर्म कैसे भरें?"
-  ];
+  // Scroll to bottom of chat when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   // Update query when transcript changes
   useEffect(() => {
@@ -56,21 +95,21 @@ export default function HeroSection() {
     }
   };
 
-  const features = [
-    { icon: '🇮🇳', text: "12+ Indian Languages" },
-    { icon: '📝', text: "Auto-Form Filler" },
-    { icon: '🔊', text: "Voice Assistant" },
-    { icon: '⚡', text: "Instant Results" },
-    { icon: '🔒', text: "Aadhaar Secure" },
-    { icon: '🏛️', text: "Govt Approved" }
-  ];
-
-  // Handle search submission
+  // Handle chat message submission
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
     if (!query.trim()) return;
     
+    // Add user message to chat
+    const userMessage = {
+      role: 'user',
+      content: query,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    setChatMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    
     try {
       const response = await fetch('/api/gpt4', {
         method: 'POST',
@@ -85,243 +124,272 @@ export default function HeroSection() {
       }
 
       const data = await response.json();
-      setSearchResults(data.results || []);
+      
+      // Format the response for the chat - simplified clean format
+      let botResponse = '';
+      if (data.results && data.results.length > 0) {
+        const result = data.results[0];
+        
+        // Process content - format title as main heading
+        const mainTitle = `<h2 class="text-2xl font-bold text-gray-900 mb-4">${result.title}</h2>`;
+        
+        // Format section headings (numbered points or keywords)
+        let processedContent = result.content
+          // Format numbered headings (1. * Title)
+          .replace(/(\d+)\.\s*\*\s*([^:*]+)(:\*\*|\*\*)/g, 
+            '<h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1. $2</h3>')
+          
+          // Format unnumbered headings (* Title)
+          .replace(/\*\s*([^:*]+)(:\*\*|\*\*)/g, 
+            '<h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1</h3>')
+          
+          // Break content into paragraphs
+          .split('\n\n')
+          .map(para => {
+            if (para.startsWith('<h3')) {
+              return para;
+            }
+            return `<p class="mb-4 text-gray-700 leading-relaxed">${para}</p>`;
+          })
+          .join('');
+        
+        // Format lists (numbered/unnumbered)
+        processedContent = processedContent
+          // Format numbered list items when they appear in paragraphs
+          .replace(/<p class="[^"]+">(\d+)\.\s+([^<]+)<\/p>/g, 
+            '<div class="mb-3 pl-4"><span class="font-semibold text-gray-800 mr-2">$1.</span>$2</div>');
+        
+        // Format URLs as proper links
+        processedContent = processedContent
+          .replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g, 
+            '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">$1</a>');
+        
+        botResponse = `
+          <div class="space-y-4">
+            ${mainTitle}
+            <div class="space-y-2">
+              ${processedContent}
+            </div>
+            ${result.link ? 
+              `<div class="mt-6 pt-4 border-t border-gray-200">
+                <a href="${result.link}" target="_blank" rel="noopener noreferrer" 
+                  class="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium">
+                  <span>Official Website</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>` 
+              : ''
+            }
+          </div>`;
+      } else {
+        botResponse = `
+          <div>
+            <p class="mb-2">I couldn't find specific information for your query. Could you please provide more details?</p>
+          </div>`;
+      }
+      
+      // Add bot response to chat
+      const botMessage = {
+        role: 'bot',
+        content: botResponse,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setChatMessages(prev => [...prev, botMessage]);
+      setQuery(''); // Clear input after sending
     } catch (error) {
       console.error('Error fetching results:', error);
-      setSearchResults([{
-        title: 'Error',
-        content: 'Sorry, we encountered an error while processing your request. Please try again.',
-        link: null
-      }]);
+      
+      // Add error message to chat
+      const errorMessage = {
+        role: 'bot',
+        content: `
+          <div>
+            <p>Sorry, I couldn't process your request. Please try again later.</p>
+          </div>`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isError: true
+      };
+      
+      setChatMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Function to handle Enter key press
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  // Focus the input field when the component mounts
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  // Get appropriate greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
-    <section className="hero-section">
-      {/* Background Elements */}
-      <div className="hero-bg-overlay"></div>
-      <div className="hero-bg-lights"></div>
+    <section className="min-h-screen bg-gray-50 flex flex-col relative overflow-hidden">
+      {/* Background Animation */}
+      <div className="absolute inset-0 opacity-10">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#FF9933" strokeWidth="2" opacity="0.3">
+            <animate attributeName="r" from="40" to="50" dur="5s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="70" cy="30" r="20" fill="none" stroke="#138808" strokeWidth="1.5" opacity="0.3">
+            <animate attributeName="r" from="20" to="25" dur="7s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="30" cy="70" r="25" fill="none" stroke="#000080" strokeWidth="1.5" opacity="0.2">
+            <animate attributeName="r" from="25" to="30" dur="6s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+      </div>
       
-      <div className="hero-container">
-        {/* Text Content */}
-        <div className="hero-text-container">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="hero-badge"
-          >
-            <RiGovernmentFill className="hero-badge-icon" />
-            <span>Official Partner</span>
-          </motion.div>
+      {/* Header */}
+      <header className="border-b border-gray-200 py-2 px-4 flex justify-between items-center bg-white sticky top-0 z-10">
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-orange-500 flex items-center justify-center text-white">
+            <span className="font-medium">BG</span>
+          </div>
+          <span className="font-medium text-lg">BharatGPT</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white">
+            <span className="font-medium">{username ? username.charAt(0).toUpperCase() : 'G'}</span>
+          </div>
+        </div>
+      </header>
 
-          <h1 className="hero-title">
-            <span className="hero-title-accent">Bharat</span>GPT
-            <span className="hero-subtitle">Your Desi AI Assistant</span>
-          </h1>
-
-          <p className="hero-description">
-            Solving <span>real Indian problems</span> in Hindi, Tamil, Marathi and more!
-          </p>
-
-          {/* Search Form */}
-          <form className="hero-search-form" onSubmit={handleSearch}>
-            <div className="hero-search-input-container relative">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={suggestions[currentSuggestion]}
-                className="hero-search-input"
-                aria-label="Search query"
-              />
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col justify-center items-center px-4">
+        {/* Welcome Message and Input Area - Centered with input below center */}
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+          {chatMessages.length === 1 && !isLoading ? (
+            /* Welcome Message - Only shown initially */
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-semibold text-gray-800 mb-2">
+                {getGreeting()}, {username}.
+              </h1>
+              <p className="text-xl text-gray-500 mb-8">
+                How can I help you today?
+              </p>
+            </div>
+          ) : (
+            /* Chat conversation view when there are messages */
+            <div className="w-full space-y-10 mb-6">
+              {chatMessages.map((message, index) => (
+                index !== 0 && (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="mb-1 font-medium text-gray-800">
+                      {message.role === 'user' ? 'You' : (
+                        <div className="flex items-center gap-2">
+                          <div className="h-5 w-5 rounded-full bg-gray-900 flex items-center justify-center text-white text-xs">
+                            B
+                          </div>
+                          <span>BharatGPT</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {message.role === 'user' ? (
+                      <div className="text-gray-800">
+                        {message.content}
+                      </div>
+                    ) : (
+                      <div 
+                        className={`text-gray-800 ${message.isError ? 'text-red-600' : ''}`}
+                        dangerouslySetInnerHTML={{ __html: message.content }}
+                      />
+                    )}
+                  </motion.div>
+                )
+              ))}
+              
+              {isLoading && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <div className="mb-1 font-medium text-gray-800 flex items-center gap-2">
+                    <div className="h-5 w-5 rounded-full bg-gray-900 flex items-center justify-center text-white text-xs">
+                      B
+                    </div>
+                    <span>BharatGPT</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          )}
+          
+          {/* Input Area - Always visible */}
+          <div className="w-full mt-4">
+            <form onSubmit={handleSearch} className="relative">
+              <div className="flex items-center bg-white border border-gray-300 rounded-full overflow-hidden focus-within:border-gray-400 focus-within:ring-1 focus-within:ring-gray-400 shadow-md">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="What do you want to know?"
+                  className="flex-grow py-4 px-5 border-none focus:outline-none text-gray-800 placeholder-gray-500 text-lg"
+                />
+                <div className="flex items-center pr-4">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    type="button"
+                    onClick={handleVoiceInput}
+                    className={`p-2 rounded-full ${isListening ? 'text-red-500' : 'text-gray-400 hover:text-gray-700'}`}
+                  >
+                    {isListening ? <FaMicrophoneSlash className="text-xl" /> : <FaMicrophone className="text-xl" />}
+                  </motion.button>
+                  <motion.button 
+                    type="submit" 
+                    className={`p-2 rounded-full ${!query.trim() || isLoading ? 'text-gray-300' : 'text-gray-700 hover:text-gray-900'}`}
+                    whileHover={{ scale: query.trim() && !isLoading ? 1.1 : 1 }}
+                    whileTap={{ scale: query.trim() && !isLoading ? 0.9 : 1 }}
+                    disabled={isLoading || !query.trim()}
+                  >
+                    <RiSendPlaneFill className="text-xl rotate-90" />
+                  </motion.button>
+                </div>
+              </div>
               {voiceError && (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="absolute -bottom-10 left-0 right-0 bg-red-500 text-white text-sm p-2 rounded-md z-10"
+                  className="absolute -top-12 left-0 right-0 bg-red-500 text-white text-sm p-2 rounded-md z-10"
                 >
                   {voiceError}
                 </motion.div>
               )}
-              <div className="hero-search-buttons">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  type="button"
-                  onClick={handleVoiceInput}
-                  className={`hero-voice-btn ${isListening ? 'listening' : ''}`}
-                  title={isListening ? 'Stop listening' : 'Start voice input'}
-                  aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
-                  aria-pressed={isListening}
-                >
-                  {isListening ? <FaMicrophoneSlash /> : <FaMicrophone />}
-                  {isListening && (
-                    <motion.span 
-                      className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ repeat: Infinity, duration: 1.5 }}
-                    />
-                  )}
-                </motion.button>
-                <motion.button 
-                  type="button" 
-                  onClick={handleSearch}
-                  className="hero-search-btn"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Search"
-                >
-                  <FaSearch />
-                </motion.button>
-              </div>
-            </div>
-            <motion.button 
-              type="button" 
-              onClick={handleSearch}
-              className="hero-cta-btn"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Ask BharatGPT
-            </motion.button>
-          </form>
-
-          {/* Features Grid */}
-          <div className="hero-features-grid">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ y: -5 }}
-                className="hero-feature-card"
-              >
-                <div className="hero-feature-icon">{feature.icon}</div>
-                <span>{feature.text}</span>
-              </motion.div>
-            ))}
+            </form>
           </div>
-        </div>
-
-        {/* Search Results */}
-        <div className="hero-search-results">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="hero-search-results-container animate-fade-in"
-          >
-            <div className="hero-search-results-header">
-              <div className="hero-search-results-badge">
-                <span>Live</span> Results
-              </div>
-              <div className="hero-search-results-emoji">🇮🇳</div>
-            </div>
-            
-            {isLoading ? (
-              <div className="hero-search-results-placeholder">
-                <motion.div 
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                  className="hero-search-results-placeholder-icon"
-                >
-                  <FaSearch className="text-4xl text-gray-400" />
-                </motion.div>
-                <p>Searching for answers...</p>
-              </div>
-            ) : query ? (
-              <div className="hero-search-results-content">
-                {searchResults.length > 0 ? (
-                  <div className="results-section">
-                    {searchResults.map((result, index) => (
-                      <motion.div 
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.2 }}
-                        className="hero-search-result-item"
-                      >
-                        <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                          {typeof result.title === 'string' ? result.title : JSON.stringify(result.title)}
-                        </h3>
-                        <div 
-                          className="prose prose-sm max-w-none mb-4 text-gray-600 bg-white rounded-lg p-6 shadow-sm"
-                          style={{ 
-                            width: '100%',
-                            height: 'auto',
-                            position: 'relative',
-                            zIndex: 1
-                          }}
-                        >
-                          {result.content.split('\n').map((line, i) => {
-                            if (!line.trim()) return null;
-                            
-                            const isMainPoint = /^\d+\./.test(line);
-                            const isBulletPoint = line.trim().startsWith('-') || line.trim().startsWith('•');
-                            
-                            return (
-                              <div 
-                                key={i}
-                                className={`content-item ${isBulletPoint ? 'ml-6' : ''} ${isMainPoint ? 'main-point' : ''}`}
-                                style={{
-                                  backgroundColor: 'white',
-                                  padding: isMainPoint ? '1rem' : '0.5rem',
-                                  borderRadius: '0.5rem',
-                                  marginTop: isMainPoint ? '1rem' : '0.25rem',
-                                  boxShadow: isMainPoint ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                                  borderLeft: isBulletPoint ? '2px solid #e5e7eb' : 'none'
-                                }}
-                              >
-                                {isMainPoint ? (
-                                  <strong className="text-lg text-gray-800 block">
-                                    {line}
-                                  </strong>
-                                ) : isBulletPoint ? (
-                                  <div className="flex items-start">
-                                    <span className="mr-2 text-gray-400">•</span>
-                                    <span>{line.replace(/^[-•]\s*/, '')}</span>
-                                  </div>
-                                ) : (
-                                  <span>{line}</span>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                        {result.link && (
-                          <a 
-                            href={result.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-blue-600 hover:text-blue-800 mt-2"
-                          >
-                            <span>Official Website</span>
-                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        )}
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="hero-search-results-placeholder">
-                    <p>No results found. Try a different query.</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="hero-search-results-placeholder">
-                <motion.div 
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="hero-search-results-placeholder-icon"
-                >
-                  <FaSearch className="text-4xl text-gray-400" />
-                </motion.div>
-                <p>Enter your query above to get instant assistance</p>
-              </div>
-            )}
-          </motion.div>
         </div>
       </div>
     </section>

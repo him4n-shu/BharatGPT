@@ -33,7 +33,52 @@ module.exports = {
         'card': '0.5rem',
         'button': '0.375rem',
       },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            color: theme('colors.gray.700'),
+            h3: {
+              color: theme('colors.saffron'),
+              fontWeight: '600',
+              marginTop: '1.5em',
+              marginBottom: '0.5em',
+            },
+            h4: {
+              color: theme('colors.green'),
+              fontWeight: '500',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            strong: {
+              color: theme('colors.gray.800'),
+            },
+            a: {
+              color: theme('colors.saffron'),
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            },
+            ul: {
+              li: {
+                '&:before': {
+                  backgroundColor: theme('colors.saffron'),
+                },
+              },
+            },
+            ol: {
+              li: {
+                '&:before': {
+                  color: theme('colors.green'),
+                },
+              },
+            },
+          },
+        },
+      }),
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };

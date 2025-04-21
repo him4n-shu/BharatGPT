@@ -162,8 +162,8 @@ export default function PrivacyPolicy() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <p className="text-gray-700 font-medium">BharatGPT</p>
-                <p className="text-gray-600">Email: privacy@bharatgpt.in</p>
-                <p className="text-gray-600">Address: 123 Tech Park, Bangalore, Karnataka, India</p>
+                <p className="text-gray-600">Email: himanshu7554@gmail.com</p>
+                <p className="text-gray-600">Address: Kolkata, West Bengal, India</p>
               </div>
             </motion.div>
           </div>

@@ -315,17 +315,12 @@ export default function Navbar() {
         </AnimatePresence>
       </div>
 
-      {/* Animated Tricolor Stripe */}
-      <motion.div
-        className="tricolor-stripe flex h-1"
-        initial={{ width: '0%' }}
-        animate={{ width: '100%' }}
-        transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse' }}
-      >
-        <div className="tricolor-saffron w-1/3 h-full"></div>
-        <div className="tricolor-white w-1/3 h-full"></div>
-        <div className="tricolor-green w-1/3 h-full"></div>
-      </motion.div>
+      {/* Tricolor Stripe (Static) */}
+      <div className="flex h-1">
+        <div className="bg-[#FF9933] w-1/3 h-full"></div>
+        <div className="bg-white w-1/3 h-full"></div>
+        <div className="bg-[#138808] w-1/3 h-full"></div>
+      </div>
     </nav>
   );
 }

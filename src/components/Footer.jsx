@@ -73,28 +73,33 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-[#FF9933]">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
-                  Sarkari Babu Mode
+                <Link href="/services/sarkari-sahayak" className="text-gray-400 hover:text-[#138808] transition-colors">
+                  Sarkari Sahayak
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
-                  Auto-Form Filler
+                <Link href="/services/form-bharna-made-easy" className="text-gray-400 hover:text-[#138808] transition-colors">
+                  Form Bharna Made Easy
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
-                  Gaon Connect
+                <Link href="/services/kisan-bot" className="text-gray-400 hover:text-[#138808] transition-colors">
+                  Kisan Bot
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
-                  Paise Bachao Tips
+                <Link href="/services/paise-ki-bachat" className="text-gray-400 hover:text-[#138808] transition-colors">
+                  Paise Ki Bachat
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="text-gray-400 hover:text-[#138808] transition-colors">
-                  Emergency Alerts
+                <Link href="/services/suraksha-sahayata" className="text-gray-400 hover:text-[#138808] transition-colors">
+                  Suraksha Sahayata
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/elderly-care" className="text-gray-400 hover:text-[#138808] transition-colors">
+                  Elderly Care
                 </Link>
               </li>
             </ul>

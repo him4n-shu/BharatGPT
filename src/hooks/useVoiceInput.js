@@ -88,23 +88,6 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
     setRecognition(recognitionInstance);
   }, [language]);
 
-  // Effect to set up recognition
-  useEffect(() => {
-    initializeRecognition();
-
-    return () => {
-      if (recognition) {
-        recognition.stop();
-        recognition.onend = null;
-      }
-      
-      // Clear any silence detection timer
-      if (silenceTimer) {
-        clearTimeout(silenceTimer);
-      }
-    };
-  }, [initializeRecognition]);
-
   // Start Listening
   const startListening = useCallback(() => {
     if (recognition && !isListening) {
@@ -146,6 +129,23 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
     if (isListening) stopListening();
     else startListening();
   }, [isListening, startListening, stopListening]);
+
+  // Effect to set up recognition
+  useEffect(() => {
+    initializeRecognition();
+
+    return () => {
+      if (recognition) {
+        recognition.stop();
+        recognition.onend = null;
+      }
+      
+      // Clear any silence detection timer
+      if (silenceTimer) {
+        clearTimeout(silenceTimer);
+      }
+    };
+  }, [initializeRecognition, recognition, silenceTimer]);
 
   return {
     isListening,

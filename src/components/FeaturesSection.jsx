@@ -3,63 +3,69 @@ import { motion } from 'framer-motion';
 import { FaRupeeSign, FaHospital, FaLanguage, FaArrowRight, FaStar, FaRegStar } from 'react-icons/fa';
 import { GiFarmer, GiArchiveResearch, GiIndiaGate } from 'react-icons/gi';
 import { RiGovernmentFill, RiVerifiedBadgeFill } from 'react-icons/ri';
-import { IoIosRocket } from 'react-icons/io';
+import Link from 'next/link';
 
 export default function FeaturesSection() {
   const features = [
     {
       id: 1,
-      title: 'Sarkari Babu Mode',
-      description: 'Get step-by-step guidance for certificates, schemes, and government processes.',
+      title: 'Sarkari Sahayak',
+      description: 'Get simplified summaries of govt schemes (PMAY, PM Kisan, etc.) and steps to apply.',
       icon: <RiGovernmentFill className="text-3xl" />,
       color: 'from-[#FF9933] to-[#FFD699]', 
       tag: 'Most Popular',
       bonus: 'Includes FREE document checklist',
+      link: '/services/sarkari-sahayak'
     },
     {
       id: 2,
-      title: 'Auto-Form Filler',
-      description: 'Upload Aadhaar to auto-fill ration card, passport, and 50+ government forms.',
+      title: 'Form Bharna Made Easy',
+      description: 'AI explains what each field means in ration/passport forms.',
       icon: <GiArchiveResearch className="text-3xl" />,
       color: 'from-[#138808] to-[#8BC34A]', 
       tag: 'Time Saver',
-      bonus: '100% error-free guarantee',
+      bonus: 'Supports 50+ government forms',
+      link: '/services/form-bharna-made-easy'
     },
     {
       id: 3,
-      title: 'Gaon Connect',
-      description: 'Track Kisan Credit Card, PM Kisan status + get personalized farming advice.',
+      title: 'Kisan Bot',
+      description: 'Weather info, mandi prices, crop suggestions based on region.',
       icon: <GiFarmer className="text-3xl" />,
       color: 'from-[#512DA8] to-[#9575CD]', 
       tag: 'For Farmers',
-      bonus: 'Weather alerts included',
+      bonus: 'Daily price updates',
+      link: '/services/kisan-bot'
     },
     {
       id: 4,
-      title: 'Paise Bachao Tips',
-      description: 'Find cheapest LPG, medicines, and groceries near you with price comparisons.',
+      title: 'Paise Ki Bachat',
+      description: 'Weekly tips for saving money, subsidies, and free resources.',
       icon: <FaRupeeSign className="text-3xl" />,
       color: 'from-[#E53935] to-[#EF9A9A]',
       tag: 'Money Saver',
-      bonus: 'Price drop alerts',
+      bonus: 'New tips every week',
+      link: '/services/paise-ki-bachat'
     },
     {
       id: 5,
-      title: 'Emergency Alerts',
-      description: 'Real-time hospital bed availability, emergency contacts, and disaster alerts.',
+      title: 'Suraksha Sahayata',
+      description: 'Emergency numbers for police, fire, ambulance, and local helplines.',
       icon: <FaHospital className="text-3xl" />,
       color: 'from-[#1E88E5] to-[#90CAF9]', 
       tag: 'Life Saver',
-      bonus: 'SOS feature included',
+      bonus: 'Location-based contacts',
+      link: '/services/suraksha-sahayata'
     },
     {
       id: 6,
-      title: 'Multi-lingual Support',
-      description: 'Works in Hindi, Tamil, Bengali, Marathi + 8 other Indian languages.',
-      icon: <FaLanguage className="text-3xl" />,
-      color: 'from-[#F4511E] to-[#FFAB91]', 
-      tag: 'For All Indians',
-      bonus: 'Voice input available',
+      title: 'Elderly Care',
+      description: 'Comprehensive support for senior citizens with healthcare and daily assistance.',
+      icon: <FaRegStar className="text-3xl" />,
+      color: 'from-[#9C27B0] to-[#E1BEE7]', 
+      tag: 'For Seniors',
+      bonus: 'Government scheme assistance',
+      link: '/services/elderly-care'
     },
   ];
 
@@ -145,14 +151,16 @@ export default function FeaturesSection() {
                     <p className="text-green-600 font-semibold animate-fade-in">{feature.bonus}</p>
                   </div>
                   
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="mt-6 w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#FF9933] to-[#138808] text-white rounded-lg font-medium hover:shadow-lg transition-all"
-                  >
-                    Try Now
-                    <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </motion.button>
+                  <Link href={feature.link}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="mt-6 w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#FF9933] to-[#138808] text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                    >
+                      Try Now
+                      <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                    </motion.div>
+                  </Link>
                 </div>
               </div>
             </motion.div>
