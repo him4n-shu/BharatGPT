@@ -5,6 +5,8 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
+console.log('MongoDB URI prefix:', uri.split('@')[0].split(':')[0]); // Logs only the protocol part for safety
+
 const options = {
   maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '5'),
   minPoolSize: parseInt(process.env.MONGODB_MIN_POOL_SIZE || '1'),
@@ -27,7 +29,24 @@ if (!clientPromise) {
       return client;
     })
     .catch(err => {
-      console.error('Failed to connect to MongoDB:', err);
+      console.error('Failed to connect to MongoDB. Error details:');
+      console.error('Error name:', err.name);
+      console.error('Error message:', err.message);
+      console.error('Error code:', err.code);
+      if (err.cause) {
+        console.error('Cause:', err.cause.message);
+      }
+      
+      // Check if it's a connection string issue
+      if (err.message.includes('Invalid connection string')) {
+        console.error('Invalid MongoDB connection string. Please check your MONGODB_URI environment variable.');
+      }
+      
+      // Check if it's an authentication issue
+      if (err.message.includes('Authentication failed')) {
+        console.error('MongoDB authentication failed. Please check your username and password.');
+      }
+      
       throw err;
     });
 }
