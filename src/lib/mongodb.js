@@ -14,7 +14,11 @@ const options = {
   connectTimeoutMS: 5000,
   socketTimeoutMS: 30000,
   serverSelectionTimeoutMS: 5000,
-  family: 4,
+  ssl: true,
+  tls: true,
+  tlsInsecure: false,
+  tlsAllowInvalidCertificates: false,
+  tlsAllowInvalidHostnames: false,
   retryWrites: true,
   w: 'majority'
 };
@@ -45,6 +49,13 @@ if (!clientPromise) {
       // Check if it's an authentication issue
       if (err.message.includes('Authentication failed')) {
         console.error('MongoDB authentication failed. Please check your username and password.');
+      }
+
+      // Check if it's an SSL/TLS issue
+      if (err.message.includes('SSL') || err.message.includes('TLS')) {
+        console.error('SSL/TLS Connection Error. Please check:');
+        console.error('1. Node.js version is up to date');
+        console.error('2. SSL/TLS settings in MongoDB Atlas');
       }
       
       throw err;
