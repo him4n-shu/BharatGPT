@@ -16,9 +16,6 @@ const options = {
   serverSelectionTimeoutMS: 5000,
   ssl: true,
   tls: true,
-  tlsInsecure: false,
-  tlsAllowInvalidCertificates: false,
-  tlsAllowInvalidHostnames: false,
   retryWrites: true,
   w: 'majority'
 };
