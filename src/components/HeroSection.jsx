@@ -53,21 +53,19 @@ export default function HeroSection() {
 
   // Auto-rotate suggestions
   useEffect(() => {
-    if (suggestions.length === 0) return; // Guard clause if no suggestions
+    if (suggestions.length === 0) return;
     const interval = setInterval(() => {
       setCurrentSuggestion((prev) => (prev + 1) % suggestions.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  // Scroll to bottom of chat when new messages arrive
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
 
-  // Update query when transcript changes
   useEffect(() => {
     if (transcript && isListening) {
       setQuery(transcript);
@@ -100,7 +98,6 @@ export default function HeroSection() {
     if (e) e.preventDefault();
     if (!query.trim()) return;
     
-    // Add user message to chat
     const userMessage = {
       role: 'user',
       content: query,
@@ -125,25 +122,18 @@ export default function HeroSection() {
 
       const data = await response.json();
       
-      // Format the response for the chat - simplified clean format
       let botResponse = '';
       if (data.results && data.results.length > 0) {
         const result = data.results[0];
         
-        // Process content - format title as main heading
         const mainTitle = `<h2 class="text-2xl font-bold text-gray-900 mb-4">${result.title}</h2>`;
         
-        // Format section headings (numbered points or keywords)
         let processedContent = result.content
-          // Format numbered headings (1. * Title)
           .replace(/(\d+)\.\s*\*\s*([^:*]+)(:\*\*|\*\*)/g, 
             '<h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1. $2</h3>')
           
-          // Format unnumbered headings (* Title)
           .replace(/\*\s*([^:*]+)(:\*\*|\*\*)/g, 
             '<h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1</h3>')
-          
-          // Break content into paragraphs
           .split('\n\n')
           .map(para => {
             if (para.startsWith('<h3')) {
@@ -153,13 +143,9 @@ export default function HeroSection() {
           })
           .join('');
         
-        // Format lists (numbered/unnumbered)
         processedContent = processedContent
-          // Format numbered list items when they appear in paragraphs
           .replace(/<p class="[^"]+">(\d+)\.\s+([^<]+)<\/p>/g, 
             '<div class="mb-3 pl-4"><span class="font-semibold text-gray-800 mr-2">$1.</span>$2</div>');
-        
-        // Format URLs as proper links
         processedContent = processedContent
           .replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g, 
             '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">$1</a>');
@@ -198,7 +184,7 @@ export default function HeroSection() {
       };
       
       setChatMessages(prev => [...prev, botMessage]);
-      setQuery(''); // Clear input after sending
+      setQuery(''); 
     } catch (error) {
       console.error('Error fetching results:', error);
       
@@ -276,10 +262,8 @@ export default function HeroSection() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col justify-center items-center px-4">
-        {/* Welcome Message and Input Area - Centered with input below center */}
         <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
           {chatMessages.length === 1 && !isLoading ? (
-            /* Welcome Message - Only shown initially */
             <div className="text-center mb-8">
               <h1 className="text-4xl font-semibold text-gray-800 mb-2">
                 {getGreeting()}, {username}.
@@ -289,7 +273,6 @@ export default function HeroSection() {
               </p>
             </div>
           ) : (
-            /* Chat conversation view when there are messages */
             <div className="w-full space-y-10 mb-6">
               {chatMessages.map((message, index) => (
                 index !== 0 && (
@@ -345,7 +328,7 @@ export default function HeroSection() {
             </div>
           )}
           
-          {/* Input Area - Always visible */}
+          {/* Input Area */}
           <div className="w-full mt-4">
             <form onSubmit={handleSearch} className="relative">
               <div className="flex items-center bg-white border border-gray-300 rounded-full overflow-hidden focus-within:border-gray-400 focus-within:ring-1 focus-within:ring-gray-400 shadow-md">

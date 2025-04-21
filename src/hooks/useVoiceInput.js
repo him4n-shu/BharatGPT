@@ -20,73 +20,83 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
       return;
     }
 
-    const recognitionInstance = new SpeechRecognition();
-    recognitionInstance.continuous = true;
-    recognitionInstance.interimResults = true;
-    recognitionInstance.lang = language;
-    recognitionInstance.maxAlternatives = 1;
+    // Only create a new instance if we don't already have one
+    if (!recognition) {
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = true;
+      recognitionInstance.interimResults = true;
+      recognitionInstance.lang = language;
+      recognitionInstance.maxAlternatives = 1;
 
-    // Event Handlers
-    recognitionInstance.onstart = () => {
-      setIsListening(true);
-      setError(null);
-    };
+      // Event Handlers
+      recognitionInstance.onstart = () => {
+        setIsListening(true);
+        setError(null);
+      };
 
-    recognitionInstance.onresult = (event) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
+      recognitionInstance.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalTranscript += result[0].transcript;
-        } else {
-          interimTranscript += result[0].transcript;
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            finalTranscript += result[0].transcript;
+          } else {
+            interimTranscript += result[0].transcript;
+          }
         }
-      }
 
-      // Update transcript
-      setTranscript((prev) => (finalTranscript || interimTranscript || prev).trim());
+        
+        setTranscript((prev) => (finalTranscript || interimTranscript || prev).trim());
+        const now = Date.now();
+        setLastSpeechTimestamp(now);
+        
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+        }
+        const timer = setTimeout(() => {
+          if (now === lastSpeechTimestamp && isListening) {
+            recognitionInstance.stop();
+            setIsListening(false);
+          }
+        }, silenceTimeout);
+        
+        setSilenceTimer(timer);
+      };
+
+      recognitionInstance.onerror = (event) => {
+        setIsListening(false);
+        const errorMessage = `Speech recognition error: ${event.error} (${event.message || 'Unknown reason'})`;
+        console.error(errorMessage);
+        setError(errorMessage);
+        if (event.error === 'not-allowed' || event.error === 'denied') {
+          setError('Please allow microphone access to use voice input.');
+        }
+      };
+
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, [language, recognition, silenceTimeout, lastSpeechTimestamp, isListening, silenceTimer]);
+
+  useEffect(() => {
+    initializeRecognition();
+
+    return () => {
+      if (recognition) {
+        recognition.stop();
+        recognition.onend = null;
+      }
       
-      // Reset silence detection on speech
-      setLastSpeechTimestamp(Date.now());
-      
-      // Clear any existing silence timer
       if (silenceTimer) {
         clearTimeout(silenceTimer);
       }
-      
-      // Set a new silence timer
-      const timer = setTimeout(() => {
-        const now = Date.now();
-        const lastSpeech = lastSpeechTimestamp;
-        
-        if (lastSpeech && (now - lastSpeech > silenceTimeout) && isListening) {
-          console.log('Silence detected, stopping recognition');
-          recognition.stop();
-          setIsListening(false);
-        }
-      }, silenceTimeout);
-      
-      setSilenceTimer(timer);
     };
-
-    recognitionInstance.onerror = (event) => {
-      setIsListening(false);
-      const errorMessage = `Speech recognition error: ${event.error} (${event.message || 'Unknown reason'})`;
-      console.error(errorMessage);
-      setError(errorMessage);
-      if (event.error === 'not-allowed' || event.error === 'denied') {
-        setError('Please allow microphone access to use voice input.');
-      }
-    };
-
-    recognitionInstance.onend = () => {
-      setIsListening(false);
-    };
-
-    setRecognition(recognitionInstance);
-  }, [language]);
+  }, [language]); 
 
   // Start Listening
   const startListening = useCallback(() => {
@@ -108,8 +118,6 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
           clearTimeout(silenceTimer);
           setSilenceTimer(null);
         }
-        
-        // Stop the recognition
         recognition.stop();
         setIsListening(false);
       } catch (err) {
@@ -129,23 +137,6 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
     if (isListening) stopListening();
     else startListening();
   }, [isListening, startListening, stopListening]);
-
-  // Effect to set up recognition
-  useEffect(() => {
-    initializeRecognition();
-
-    return () => {
-      if (recognition) {
-        recognition.stop();
-        recognition.onend = null;
-      }
-      
-      // Clear any silence detection timer
-      if (silenceTimer) {
-        clearTimeout(silenceTimer);
-      }
-    };
-  }, [initializeRecognition, recognition, silenceTimer]);
 
   return {
     isListening,

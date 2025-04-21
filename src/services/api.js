@@ -1,4 +1,3 @@
-// Mock delay function to simulate API latency
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 

@@ -80,7 +80,6 @@ export default function FeaturesSection() {
         </div>
 
       <div className="container mx-auto px-4 text-center mb-16 relative z-10">
-        {/* Animated Header with Tricolor Badge */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

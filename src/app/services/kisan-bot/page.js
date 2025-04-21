@@ -62,7 +62,7 @@ export default function KisanBot() {
       
       setChatMessages(prev => [...prev, botMessage]);
       setApiResponse(data.response);
-      setQuery(""); // Clear input after sending
+      setQuery("");
     } catch (error) {
       console.error('Error fetching response:', error);
       
@@ -94,11 +94,10 @@ export default function KisanBot() {
 
   return (
     <div className="bg-gradient-to-b from-[#f9f9f9] to-white min-h-screen">
-      {/* Tricolor header decoration */}
       <div className="w-full h-2 flex">
-        <div className="w-1/3 bg-[#FF9933]"></div> {/* Saffron */}
-        <div className="w-1/3 bg-white"></div> {/* White */}
-        <div className="w-1/3 bg-[#138808]"></div> {/* Green */}
+        <div className="w-1/3 bg-[#FF9933]"></div>
+        <div className="w-1/3 bg-white"></div>
+        <div className="w-1/3 bg-[#138808]"></div>
       </div>
       
       <div className="container mx-auto py-12 px-4">
@@ -122,7 +121,6 @@ export default function KisanBot() {
             <div className="w-20 h-20 bg-gradient-to-r from-[#FF9933] to-[#138808] rounded-full flex items-center justify-center text-white text-4xl animate-pulse-slow">
               🌾
             </div>
-            {/* Ashoka Chakra design element */}
             <div className="absolute top-0 w-20 h-20 rounded-full border-2 border-dashed border-blue-900 opacity-20 animate-spin-slow"></div>
           </div>
           
@@ -201,7 +199,6 @@ export default function KisanBot() {
             transition={{ duration: 0.7, delay: 0.7 }}
             className="relative bg-gradient-to-r from-[#FFF7ED] via-white to-[#F0F9F1] p-6 rounded-lg mb-10 shadow-sm overflow-hidden"
           >
-            {/* Tricolor decoration */}
             <div className="absolute top-0 right-0 w-20 h-20">
               <div className="h-1/3 bg-[#FF9933] opacity-10"></div>
               <div className="h-1/3 bg-white opacity-10"></div>
@@ -406,11 +403,10 @@ export default function KisanBot() {
         </motion.div>
       </div>
       
-      {/* Tricolor footer decoration */}
       <div className="w-full h-2 flex mt-12">
-        <div className="w-1/3 bg-[#FF9933]"></div> {/* Saffron */}
-        <div className="w-1/3 bg-white"></div> {/* White */}
-        <div className="w-1/3 bg-[#138808]"></div> {/* Green */}
+        <div className="w-1/3 bg-[#FF9933]"></div> 
+        <div className="w-1/3 bg-white"></div>
+        <div className="w-1/3 bg-[#138808]"></div> 
       </div>
     </div>
   );

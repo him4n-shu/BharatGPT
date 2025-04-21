@@ -54,11 +54,9 @@ export default function Login() {
       }
 
       toast.success('Login successful! Redirecting...');
-      
-      // Store user data in localStorage or use a state management solution
+  
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      // Redirect to dashboard or home page after successful login
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);

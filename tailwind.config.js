@@ -12,11 +12,11 @@ module.exports = {
         saffron: '#FF9933',
         white: '#FFFFFF',
         green: '#138808',
-        navy: '#000080', // Ashoka Chakra color
+        navy: '#000080', 
         // UI theme colors
-        primary: '#FF9933', // Saffron
-        secondary: '#138808', // Green
-        accent: '#000080', // Navy blue
+        primary: '#FF9933', 
+        secondary: '#138808', 
+        accent: '#000080', 
         background: '#F8F8F8',
         'light-gray': '#F0F0F0',
         'dark-gray': '#333333',

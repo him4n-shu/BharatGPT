@@ -51,11 +51,10 @@ export default function FormBharnaMadeEasy() {
 
   return (
     <div className="bg-gradient-to-b from-[#f9f9f9] to-white min-h-screen">
-      {/* Tricolor header decoration */}
       <div className="w-full h-2 flex">
-        <div className="w-1/3 bg-[#FF9933]"></div> {/* Saffron */}
-        <div className="w-1/3 bg-white"></div> {/* White */}
-        <div className="w-1/3 bg-[#138808]"></div> {/* Green */}
+        <div className="w-1/3 bg-[#FF9933]"></div> 
+        <div className="w-1/3 bg-white"></div> 
+        <div className="w-1/3 bg-[#138808]"></div>
       </div>
       
       <div className="container mx-auto py-12 px-4">
@@ -80,7 +79,6 @@ export default function FormBharnaMadeEasy() {
               <div className="w-24 h-24 bg-gradient-to-r from-[#138808] to-[#2E7D32] rounded-full flex items-center justify-center text-white text-5xl mb-6 md:mb-0 md:mr-8 animate-pulse-slow">
                 📝
               </div>
-              {/* Ashoka Chakra design element */}
               <div className="absolute top-0 left-0 w-24 h-24 rounded-full border-2 border-dashed border-blue-900 opacity-20 animate-spin-slow"></div>
             </div>
             <div>
@@ -325,12 +323,11 @@ export default function FormBharnaMadeEasy() {
           </motion.div>
         </motion.div>
       </div>
-      
-      {/* Tricolor footer decoration */}
+    
       <div className="w-full h-2 flex mt-12">
-        <div className="w-1/3 bg-[#FF9933]"></div> {/* Saffron */}
-        <div className="w-1/3 bg-white"></div> {/* White */}
-        <div className="w-1/3 bg-[#138808]"></div> {/* Green */}
+        <div className="w-1/3 bg-[#FF9933]"></div> 
+        <div className="w-1/3 bg-white"></div> 
+        <div className="w-1/3 bg-[#138808]"></div> 
       </div>
     </div>
   );

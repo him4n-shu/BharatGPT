@@ -9,11 +9,10 @@ export default function Services() {
 
   return (
     <div className="bg-gradient-to-b from-[#f9f9f9] to-white min-h-screen">
-      {/* Tricolor header decoration */}
       <div className="w-full h-2 flex">
-        <div className="w-1/3 bg-[#FF9933]"></div> {/* Saffron */}
-        <div className="w-1/3 bg-white"></div> {/* White */}
-        <div className="w-1/3 bg-[#138808]"></div> {/* Green */}
+        <div className="w-1/3 bg-[#FF9933]"></div> 
+        <div className="w-1/3 bg-white"></div> 
+        <div className="w-1/3 bg-[#138808]"></div> 
       </div>
       
       <div className="container mx-auto px-4 py-16">
@@ -36,7 +35,6 @@ export default function Services() {
             Empowering every Indian citizen with AI-powered solutions for everyday government and civic needs.
           </p>
           
-          {/* Chakra decoration */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 opacity-5 w-72 h-72">
             <div className="w-full h-full border-[15px] border-[#000080] rounded-full animate-spin-slow"></div>
             <div className="absolute inset-0 border-[2px] border-[#000080] rounded-full"></div>
@@ -224,11 +222,10 @@ export default function Services() {
         </div>
       </div>
       
-      {/* Tricolor footer decoration */}
       <div className="w-full h-2 flex mt-12">
-        <div className="w-1/3 bg-[#FF9933]"></div> {/* Saffron */}
-        <div className="w-1/3 bg-white"></div> {/* White */}
-        <div className="w-1/3 bg-[#138808]"></div> {/* Green */}
+        <div className="w-1/3 bg-[#FF9933]"></div> 
+        <div className="w-1/3 bg-white"></div> 
+        <div className="w-1/3 bg-[#138808]"></div> 
       </div>
     </div>
   );

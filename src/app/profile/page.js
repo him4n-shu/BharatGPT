@@ -27,19 +27,15 @@ export default function Profile() {
     } else {
       // Redirect to login if no user data found
       window.location.href = '/login';
-      return; // Add return to prevent setting isLoading to false
+      return; 
     }
     setIsLoading(false);
   }, []);
 
   const handleLogout = () => {
-    // Clear user data from localStorage
     localStorage.removeItem('user');
-    // Update state
     setUser(null);
-    // Show success message
     toast.success('Logged out successfully');
-    // Add a small delay before redirect to ensure toast is visible
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);

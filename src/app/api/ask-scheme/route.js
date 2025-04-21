@@ -69,7 +69,7 @@ Focus specifically on agriculture-related information relevant to Indian farmers
 `;
         break;
         
-      default: // scheme
+      default: 
         systemPrompt = 'You are a helpful assistant that provides information about Indian government schemes and services.';
         contextPrompt = `
 Focus specifically on information about government schemes in India, including:

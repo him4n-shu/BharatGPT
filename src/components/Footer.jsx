@@ -167,9 +167,6 @@ export default function Footer() {
                   }, 3000);
                   return;
                 }
-                
-                // Here you would typically send the email to your backend
-                // For now, we'll just show the success message
                 const successMsg = document.getElementById('successMessage');
                 successMsg.style.opacity = 1;
                 
