@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { navLinks } from '../constants/data';
 
@@ -79,15 +80,25 @@ export default function Navbar() {
           {/* Logo with animated Jai Hind badge */}
           <motion.div className="flex items-center">
             <Link href="/" className="flex items-center group" aria-label="Go to Home">
-              <motion.span
-                className="text-2xl font-bold"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
-                <span style={{ color: '#FF9933' }}>Bharat</span>
-                <span style={{ color: '#ffffff' }}>GPT</span>
-              </motion.span>
+              <div className="flex items-center">
+                <Image
+                  src="/bg-logo.png"
+                  alt="BharatGPT Logo"
+                  width={83}
+                  height={60}
+                  className="rounded-full mr-2"
+                  priority
+                />
+                <motion.span
+                  className="text-2xl font-bold"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  <span style={{ color: '#FF9933' }}>Bharat</span>
+                  <span style={{ color: '#ffffff' }}>GPT</span>
+                </motion.span>
+              </div>
               <motion.span
                 className="logo-badge ml-2 px-2 py-1 bg-green-100 text-xs rounded-full text-green-800"
                 variants={badgeVariants}

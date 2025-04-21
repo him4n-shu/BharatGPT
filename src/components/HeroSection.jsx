@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { RiSendPlaneFill} from 'react-icons/ri';
 import useVoiceInput from '../hooks/useVoiceInput';
+import Image from 'next/image';
 
 export default function HeroSection() {
   const [query, setQuery] = useState('');
@@ -248,8 +249,14 @@ export default function HeroSection() {
       {/* Header */}
       <header className="border-b border-gray-200 py-2 px-4 flex justify-between items-center bg-white sticky top-0 z-10">
         <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-orange-500 flex items-center justify-center text-white">
-            <span className="font-medium">BG</span>
+          <div className="h-15 w-15 rounded-full overflow-hidden">
+            <Image
+              src="/bg-logo.png"
+              alt="BharatGPT Logo"
+              width={90}
+              height={90}
+              priority
+            />
           </div>
           <span className="font-medium text-lg">BharatGPT</span>
         </div>

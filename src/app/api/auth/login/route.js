@@ -27,7 +27,7 @@ export async function POST(request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
@@ -36,7 +36,7 @@ export async function POST(request) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
@@ -47,7 +47,8 @@ export async function POST(request) {
     // Generate JWT token
     const token = generateToken(userWithoutPassword);
 
-    return NextResponse.json(
+    // Set cookie with token
+    const response = NextResponse.json(
       {
         message: 'Login successful',
         user: userWithoutPassword,
@@ -55,8 +56,26 @@ export async function POST(request) {
       },
       { status: 200 }
     );
+
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
+    });
+
+    return response;
   } catch (error) {
-    console.error('Login error:', error.message);
+    console.error('Login error:', error);
+
+    // Check if it's a JSON parsing error
+    if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      return NextResponse.json(
+        { error: 'Invalid request format' },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

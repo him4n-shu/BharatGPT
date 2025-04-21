@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
 import bcrypt from 'bcryptjs';
-
-// MongoDB Connection URI
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bharatgpt';
+import clientPromise from '@/lib/mongodb';
 
 export async function POST(request) {
   try {
@@ -17,17 +14,14 @@ export async function POST(request) {
       );
     }
 
-    // Connect to MongoDB
-    const client = new MongoClient(uri);
-    await client.connect();
-    
+    // Connect to MongoDB using shared client
+    const client = await clientPromise;
     const db = client.db('bharatgpt');
     const usersCollection = db.collection('users');
 
     // Check if user already exists
     const existingUser = await usersCollection.findOne({ email });
     if (existingUser) {
-      await client.close();
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 409 }
@@ -41,7 +35,7 @@ export async function POST(request) {
     // Create new user
     const newUser = {
       name,
-      email,
+      email: email.toLowerCase().trim(),
       password: hashedPassword,
       mobileNumber,
       createdAt: new Date(),
@@ -49,7 +43,6 @@ export async function POST(request) {
 
     // Insert user into database
     await usersCollection.insertOne(newUser);
-    await client.close();
 
     // Return success response (exclude password)
     const { password: _, ...userWithoutPassword } = newUser;
@@ -60,6 +53,15 @@ export async function POST(request) {
     );
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // Check if it's a JSON parsing error
+    if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      return NextResponse.json(
+        { error: 'Invalid request format' },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

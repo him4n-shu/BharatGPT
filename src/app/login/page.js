@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Head from 'next/head';
@@ -42,27 +43,36 @@ export default function Login() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (error) {
+        throw new Error('Invalid server response');
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Login failed');
       }
 
-      toast.success('Login successful! Redirecting...');
-  
+      // Save user data and token
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+      
+      toast.success('Login successful! Redirecting...');
       
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
     } catch (error) {
-      toast.error(error.message || 'Login failed. Please check your credentials.');
       console.error('Login Error:', error);
+      toast.error(error.message === 'Invalid server response' 
+        ? 'Server error. Please try again later.'
+        : error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsSubmitting(false);
     }
@@ -84,6 +94,16 @@ export default function Login() {
             transition={{ duration: 0.5 }}
             className="text-center mb-12"
           >
+            <div className="flex justify-center mb-6">
+              <Image
+                src="/bg-logo.png"
+                alt="BharatGPT Logo"
+                width={120}
+                height={120}
+                className="rounded-full shadow-lg"
+                priority
+              />
+            </div>
             <h1 className="text-5xl font-serif font-extrabold mb-4 tracking-tight">
               <span className="text-saffron">Login</span>{' '}
               <span className="text-green-700">to BharatGPT</span>
