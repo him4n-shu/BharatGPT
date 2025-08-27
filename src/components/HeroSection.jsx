@@ -25,7 +25,6 @@ export default function HeroSection() {
 
   // User information
   const [username, setUsername] = useState('');
-  const [userImage, setUserImage] = useState('');
   const { data: session, status } = useSession();
 
   // Get user data from NextAuth session or localStorage
@@ -33,7 +32,6 @@ export default function HeroSection() {
     // First check NextAuth session
     if (session?.user) {
       setUsername(session.user.name);
-      setUserImage(session.user.image || '');
     } else if (status === 'loading') {
       // Still loading session, don't set Guest yet
       return;
@@ -44,15 +42,12 @@ export default function HeroSection() {
         try {
           const parsedUser = JSON.parse(userData);
           setUsername(parsedUser.name);
-          setUserImage(parsedUser.image || '');
         } catch (error) {
           console.error('Error parsing user data:', error);
           setUsername('Guest');
-          setUserImage('');
         }
       } else {
         setUsername('Guest');
-        setUserImage('');
       }
     }
   }, [session, status]);
@@ -277,16 +272,8 @@ export default function HeroSection() {
           <span className="font-medium text-lg">BharatGPT</span>
         </div>
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white overflow-hidden">
-            {userImage ? (
-              <img 
-                src={userImage} 
-                alt={username}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="font-medium">{username ? username.charAt(0).toUpperCase() : 'G'}</span>
-            )}
+          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white">
+            <span className="font-medium">{username ? username.charAt(0).toUpperCase() : 'G'}</span>
           </div>
         </div>
       </header>
