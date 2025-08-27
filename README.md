@@ -10,6 +10,8 @@
 
 BharatGPT is a comprehensive AI assistant designed specifically for Indian citizens to navigate government services, schemes, and daily challenges with ease. Built with modern web technologies and featuring multiple authentication methods, it provides a seamless experience for users across India.
 
+> **🔧 Latest Update**: Fixed Vercel deployment issues with dependency conflicts
+
 ## 🌟 **Live Demo**
 
 🔗 **[Visit BharatGPT](https://bharat-gpt-six.vercel.app)**
