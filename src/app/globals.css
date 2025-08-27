@@ -1,0 +1,332 @@
+@import "tailwindcss";
+
+/* ===== TRICOLOR THEME ELEMENTS ===== */
+/* Used in HeroSection, Navbar, and other components with Indian flag colors */
+.tricolor-stripe {
+    overflow: hidden;
+}
+.tricolor-saffron {
+    background: #FF9933;
+    animation: saffron-pulse 3s infinite;
+}
+.tricolor-white {
+    background: #FFFFFF;
+    animation: white-pulse 3s infinite 0.5s;
+}
+.tricolor-green {
+    background: #138808;
+    animation: green-pulse 3s infinite 1s;
+}
+  
+@keyframes saffron-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+@keyframes white-pulse {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+}
+@keyframes green-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+  
+/* ===== LOGO AND BADGE ANIMATIONS ===== */
+/* Used in Navbar and HeroSection components */
+.logo-badge {
+    animation: bounce 2s infinite;
+}
+  
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+  
+/* ===== EMOJI ANIMATIONS ===== */
+/* Used in HeroSection and FeaturesSection for floating emoji elements */
+.emoji-float {
+    animation: float 6s ease-in-out infinite;
+}
+  
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+  
+/* ===== FORM ELEMENT STYLES ===== */
+/* Used in HeroSection search and VoiceAssistant component */
+.input-field:focus {
+    box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.3);
+}
+  
+/* ===== VOICE BUTTON ANIMATIONS ===== */
+/* Used in HeroSection and VoiceAssistant components */
+.voice-btn.animate-pulse {
+    animation: pulse 1.5s infinite;
+}
+  
+@keyframes pulse {
+    0% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.1); }
+    100% { transform: translateY(-50%) scale(1); }
+}
+
+/* ===== CARD AND ELEMENT EFFECTS ===== */
+/* Used in FeaturesSection and other card components */
+.card-glow {
+  box-shadow: 0 0 15px rgba(255, 153, 51, 0.5);
+}
+
+/* ===== FALLBACK STYLES ===== */
+/* Browser compatibility fallbacks */
+@supports not (-webkit-background-clip: text) {
+  .gradient-text {
+    color: #FF9933;
+  }
+}
+
+/* ===== TRANSITION EFFECTS ===== */
+/* Used in FeaturesSection cards and interactive elements */
+.feature-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+/* Mobile-specific styles for better UX on small screens */
+@media (max-width: 767px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ===== ACCESSIBILITY FOCUS STATES ===== */
+/* Improved focus indicators for keyboard navigation */
+button:focus-visible {
+  outline: 2px solid #FF9933;
+  outline-offset: 2px;
+}
+
+/* ===== CUSTOM ANIMATIONS ===== */
+/* Used across multiple components including FeaturesSection */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite ease-in-out;
+}
+
+@keyframes spin-slow {
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 6s linear infinite;
+}
+
+/* Bounce animation used in multiple components */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+/* Fade-in animation for search results in HeroSection */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 1s ease-in;
+}
+
+/* ===== COLOR VARIABLES ===== */
+/* Global color scheme used throughout the application */
+:root {
+  --saffron: #FF9933;
+  --green: #138808;
+  --primary: #1E88E5;
+}
+
+/* ===== PULSE ANIMATION ===== */
+/* Used in multiple components for attention-grabbing effects */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-pulse {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* ===== UI COMPONENT STYLES ===== */
+/* Common UI element styles */
+.rounded-button {
+  border-radius: 0.5rem;
+}
+
+/* ===== ERROR STATES ===== */
+/* Used in VoiceAssistant for error messages */
+.voice-error {
+  color: #e53e3e;
+  background-color: #fef2f2;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+.hero-search-results-content {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-search-result-item {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1.5rem;
+  padding: 2rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.hero-search-result-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.content-item {
+  transition: all 0.2s ease;
+}
+
+.content-item.main-point {
+  border-left: 3px solid #FF9933;
+}
+
+.content-item.main-point strong {
+  color: #1a1a1a;
+  font-weight: 600;
+  display: block;
+  padding-left: 1rem;
+}
+
+.content-item.ml-6 {
+  margin-left: 1.5rem;
+  border-left: 2px solid #e5e7eb;
+  padding-left: 1rem;
+}
+
+.prose {
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.prose strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.prose div {
+  background: white;
+  border-radius: 0.5rem;
+  overflow: visible;
+  margin-bottom: 0.5rem;
+}
+
+/* Scheme Response Styling */
+.scheme-response h3 {
+  font-size: 1.75rem;
+  background: linear-gradient(to right, #FF9933, #138808);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.scheme-response h4 {
+  font-size: 1.25rem;
+  color: #138808;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.scheme-response h4::before {
+  content: '';
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #FF9933;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+}
+
+.scheme-response strong {
+  color: #FF9933;
+  font-weight: 600;
+}
+
+.scheme-response ul {
+  list-style-type: none;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ul li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ul li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #FF9933;
+}
+
+.scheme-response ol {
+  list-style-type: none;
+  counter-reset: custom-counter;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ol li {
+  position: relative;
+  counter-increment: custom-counter;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.scheme-response ol li::before {
+  content: counter(custom-counter);
+  position: absolute;
+  left: 0;
+  font-weight: 600;
+  color: #138808;
+}
+
+.scheme-response [style*="background-color"] {
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.scheme-response a {
+  color: #FF9933;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px dotted #FF9933;
+}
+
+.scheme-response a:hover {
+  color: #138808;
+  border-bottom-color: #138808;
+}

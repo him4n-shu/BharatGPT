@@ -1,0 +1,36 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@auth/mongodb-adapter": "^3.10.0",
+    "@emailjs/browser": "^4.4.1",
+    "bcryptjs": "^3.0.2",
+    "emailjs-com": "^3.2.0",
+    "framer-motion": "^12.6.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.15.0",
+    "next": "15.3.0",
+    "next-auth": "^4.24.11",
+    "nodemailer": "^7.0.5",
+    "openai": "^4.94.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.9",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.0",
+    "tailwindcss": "^4"
+  }
+}
