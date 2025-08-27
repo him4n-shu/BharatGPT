@@ -512,7 +512,7 @@ We welcome contributions to BharatGPT! Here's how you can help:
 ## 📞 **Support**
 
 ### **Getting Help**
-- 📧 Email: support@bharatgpt.com
+- 📧 Email: bharatgpt23@gmail.com
 - 💬 GitHub Issues: [Report a bug](https://github.com/him4n-shu)
 
 ### **Community**

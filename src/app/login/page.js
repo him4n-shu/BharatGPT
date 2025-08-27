@@ -401,7 +401,7 @@ export default function Login() {
                           </h3>
                           <div className="mt-2 text-sm text-blue-700">
                             <p>
-                              We'll send a 6-digit verification code to your email address.
+                              We&apos;ll send a 6-digit verification code to your email address.
                               This is a secure way to access your account without a password.
                             </p>
                           </div>

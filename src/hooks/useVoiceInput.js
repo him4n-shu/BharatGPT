@@ -96,6 +96,7 @@ export default function useVoiceInput({ language = 'hi-IN', silenceTimeout = 300
         clearTimeout(silenceTimer);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]); 
 
   // Start Listening

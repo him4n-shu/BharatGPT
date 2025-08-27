@@ -476,7 +476,7 @@ export default function Register() {
                   </h3>
                   
                   <p className="text-gray-600 mb-6">
-                    Your account has been created successfully. You're now logged in and ready to explore government services.
+                    Your account has been created successfully. You&apos;re now logged in and ready to explore government services.
                   </p>
                   
                   <div className="space-y-3">

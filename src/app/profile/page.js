@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ToastContainer, toast } from 'react-toastify';
 import { useSession, signOut } from 'next-auth/react';
 import 'react-toastify/dist/ReactToastify.css';
@@ -131,9 +132,11 @@ export default function Profile() {
               <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
                 <div className="w-32 h-32 bg-gradient-to-r from-saffron to-green-700 rounded-full flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
                   {user.image ? (
-                    <img 
+                    <Image 
                       src={user.image} 
                       alt={user.name}
+                      width={128}
+                      height={128}
                       className="w-full h-full object-cover"
                     />
                   ) : (

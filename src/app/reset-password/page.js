@@ -250,7 +250,7 @@ export default function ResetPassword() {
                       Enter Your Email
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      We'll send you a verification code to reset your password
+                      We&apos;ll send you a verification code to reset your password
                     </p>
                   </div>
 
