@@ -324,3 +324,182 @@ export const sendWelcomeEmail = async (email, name) => {
     return { success: false, error: error.message };
   }
 };
+
+// Send newsletter subscription confirmation email
+export const sendNewsletterConfirmationEmail = async (email) => {
+  try {
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: {
+        name: 'BharatGPT',
+        address: process.env.EMAIL_USER,
+      },
+      to: email,
+      subject: 'Welcome to BharatGPT Newsletter! 🇮🇳',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Newsletter Subscription Confirmed</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f8f9fa;
+            }
+            .container {
+              background: white;
+              border-radius: 12px;
+              padding: 30px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+            }
+            .logo {
+              font-size: 32px;
+              font-weight: bold;
+              background: linear-gradient(45deg, #ff6b35, #f7931e, #228b22);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              margin-bottom: 15px;
+            }
+            .welcome-banner {
+              background: linear-gradient(135deg, #FF9933, #138808);
+              color: white;
+              padding: 25px;
+              border-radius: 8px;
+              text-align: center;
+              margin: 25px 0;
+            }
+            .features {
+              background: #f8f9fa;
+              border-radius: 8px;
+              padding: 20px;
+              margin: 20px 0;
+            }
+            .feature-item {
+              margin: 10px 0;
+              padding: 10px 0;
+              border-bottom: 1px solid #e9ecef;
+            }
+            .feature-item:last-child {
+              border-bottom: none;
+            }
+            .button {
+              display: inline-block;
+              padding: 15px 30px;
+              background: linear-gradient(45deg, #FF9933, #138808);
+              color: white;
+              text-decoration: none;
+              border-radius: 6px;
+              font-weight: bold;
+              margin: 20px 0;
+              text-align: center;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 30px;
+              color: #666;
+              font-size: 14px;
+            }
+            .unsubscribe {
+              color: #999;
+              font-size: 12px;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">🇮🇳 BharatGPT</div>
+            </div>
+            
+            <div class="welcome-banner">
+              <h1>Thank you for subscribing! 🎉</h1>
+              <p>You're now part of the BharatGPT community!</p>
+            </div>
+            
+            <p>Welcome to our newsletter! You'll now receive the latest updates about:</p>
+            
+            <div class="features">
+              <div class="feature-item">
+                <strong>🚀 New Features:</strong> Be the first to know about new AI capabilities and services
+              </div>
+              <div class="feature-item">
+                <strong>📋 Government Updates:</strong> Latest government schemes and policy changes
+              </div>
+              <div class="feature-item">
+                <strong>💡 Tips & Guides:</strong> How to better use BharatGPT for your needs
+              </div>
+              <div class="feature-item">
+                <strong>🎯 Success Stories:</strong> Real stories from citizens using our platform
+              </div>
+              <div class="feature-item">
+                <strong>📅 Events:</strong> Webinars, community events, and important announcements
+              </div>
+            </div>
+            
+            <p>We promise to send you only valuable content and never spam your inbox. You can unsubscribe at any time.</p>
+            
+            <div style="text-align: center;">
+              <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}" class="button">
+                Explore BharatGPT Now
+              </a>
+            </div>
+            
+            <div class="footer">
+              <p>Thanks for joining us on this journey to make government services more accessible!</p>
+              <p style="margin-top: 20px;">
+                <strong>BharatGPT Team</strong><br>
+                Empowering Citizens with AI
+              </p>
+              <div class="unsubscribe">
+                <p>You received this email because you subscribed to BharatGPT newsletter.</p>
+                <p>If you no longer wish to receive these emails, you can unsubscribe at any time by replying to this email.</p>
+                <p>© 2024 BharatGPT. All rights reserved.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      // Fallback text version
+      text: `
+        BharatGPT - Newsletter Subscription Confirmed
+        
+        Thank you for subscribing to our newsletter!
+        
+        You'll now receive updates about:
+        - New AI features and capabilities
+        - Latest government schemes and updates
+        - Tips and guides for using BharatGPT
+        - Success stories from our community
+        - Important announcements and events
+        
+        Visit us at: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}
+        
+        Best regards,
+        BharatGPT Team
+        
+        To unsubscribe, reply to this email.
+      `,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Newsletter confirmation email sent successfully:', result.messageId);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error('Error sending newsletter confirmation email:', error);
+    return { success: false, error: error.message };
+  }
+};

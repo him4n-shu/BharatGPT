@@ -138,3 +138,90 @@ export const faqQuestions = [
     answer: 'Normal passport (36 pages) ke liye 1,500 rupaye aur jumbo passport (60 pages) ke liye 2,000 rupaye lagta hai. Tatkaal service ke liye additional 1,500 rupaye extra lagenge. Ye fees online passport.gov.in pe pay kar sakte hain.',
   },
 ];
+
+// Comprehensive Services Data for Search
+export const bharatGPTServices = [
+  {
+    id: 'sarkari-sahayak',
+    name: 'Sarkari Sahayak',
+    description: 'Get simplified summaries of govt schemes (PMAY, PM Kisan, etc.) and steps to apply.',
+    icon: '🧾',
+    color: '#FF9933',
+    url: '/services/sarkari-sahayak',
+    category: 'Government',
+    tags: ['schemes', 'government', 'pmay', 'pm kisan', 'ayushman', 'ujjwala', 'subsidy', 'benefits'],
+    keywords: 'sarkari yojana government schemes pradhan mantri awas yojana pm kisan samman nidhi ayushman bharat ujjwala schemes benefits subsidy eligibility apply online',
+    popular: true
+  },
+  {
+    id: 'form-bharna-made-easy',
+    name: 'Form Bharna Made Easy',
+    description: 'AI explains what each field means in ration/passport forms, making complicated forms simple to understand.',
+    icon: '📝',
+    color: '#138808',
+    url: '/services/form-bharna-made-easy',
+    category: 'Forms',
+    tags: ['forms', 'documents', 'ration', 'passport', 'voter id', 'pan card', 'application'],
+    keywords: 'form filling ration card passport application voter id pan card documents help assistance online forms government forms',
+    popular: false
+  },
+  {
+    id: 'kisan-bot',
+    name: 'Kisan Bot',
+    description: 'Weather info, mandi prices, and crop suggestions based on your region to help farmers make better decisions.',
+    icon: '🌾',
+    color: '#FF9933',
+    url: '/services/kisan-bot',
+    category: 'Agriculture',
+    tags: ['farming', 'agriculture', 'weather', 'mandi', 'prices', 'crops', 'farmers', 'suggestions'],
+    keywords: 'kisan farming agriculture weather mandi prices crop suggestions farmers help agriculture advice rural',
+    popular: false
+  },
+  {
+    id: 'paise-ki-bachat',
+    name: 'Paise Ki Bachat',
+    description: 'Weekly tips for saving money, subsidies, and free resources to help you manage your finances better.',
+    icon: '💰',
+    color: '#138808',
+    url: '/services/paise-ki-bachat',
+    category: 'Finance',
+    tags: ['money', 'savings', 'budget', 'finance', 'subsidies', 'discounts', 'tips'],
+    keywords: 'money savings budget finance subsidies discounts tips financial planning expenses manage money',
+    popular: false
+  },
+  {
+    id: 'suraksha-sahayata',
+    name: 'Suraksha Sahayata',
+    description: 'Emergency numbers for police, fire, ambulance, and local helplines based on your location.',
+    icon: '🚨',
+    color: '#FF9933',
+    url: '/services/suraksha-sahayata',
+    category: 'Emergency',
+    tags: ['emergency', 'police', 'fire', 'ambulance', 'safety', 'helpline', 'urgent'],
+    keywords: 'emergency police fire ambulance helpline safety urgent 100 101 102 108 emergency numbers',
+    popular: false
+  },
+  {
+    id: 'elderly-care',
+    name: 'Elderly Care',
+    description: 'Comprehensive support for senior citizens including healthcare assistance, daily living help, and access to government schemes.',
+    icon: '👴',
+    color: '#138808',
+    url: '/services/elderly-care',
+    category: 'Healthcare',
+    tags: ['elderly', 'senior citizen', 'healthcare', 'old age', 'support', 'assistance', 'care'],
+    keywords: 'elderly care senior citizen old age healthcare support assistance daily living government schemes seniors',
+    popular: false
+  }
+];
+
+// Service categories for filtering
+export const serviceCategories = [
+  { id: 'all', name: 'All Services', count: bharatGPTServices.length },
+  { id: 'government', name: 'Government', count: bharatGPTServices.filter(s => s.category === 'Government').length },
+  { id: 'forms', name: 'Forms', count: bharatGPTServices.filter(s => s.category === 'Forms').length },
+  { id: 'agriculture', name: 'Agriculture', count: bharatGPTServices.filter(s => s.category === 'Agriculture').length },
+  { id: 'finance', name: 'Finance', count: bharatGPTServices.filter(s => s.category === 'Finance').length },
+  { id: 'emergency', name: 'Emergency', count: bharatGPTServices.filter(s => s.category === 'Emergency').length },
+  { id: 'healthcare', name: 'Healthcare', count: bharatGPTServices.filter(s => s.category === 'Healthcare').length }
+];

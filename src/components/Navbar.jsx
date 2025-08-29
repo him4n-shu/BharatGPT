@@ -1,19 +1,24 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { useSession, signOut } from 'next-auth/react';
-import { navLinks } from '../constants/data';
+import { useRouter } from 'next/navigation';
+import { navLinks, bharatGPTServices } from '../constants/data';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState('en');
+
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const { data: session, status } = useSession();
+  const router = useRouter();
+  const searchRef = useRef(null);
 
   // scroll effect
   useEffect(() => {
@@ -50,6 +55,59 @@ export default function Navbar() {
     }
   }, [session]);
 
+  // Search functionality
+  const performSearch = (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    const results = bharatGPTServices.filter(service => {
+      const searchFields = [
+        service.name,
+        service.description,
+        service.category,
+        service.keywords,
+        ...service.tags
+      ].join(' ').toLowerCase();
+      
+      return searchFields.includes(searchTerm);
+    });
+
+    // Sort results: exact matches first, then partial matches
+    results.sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      
+      if (aName.includes(searchTerm) && !bName.includes(searchTerm)) return -1;
+      if (!aName.includes(searchTerm) && bName.includes(searchTerm)) return 1;
+      if (a.popular && !b.popular) return -1;
+      if (!a.popular && b.popular) return 1;
+      
+      return 0;
+    });
+
+    setSearchResults(results);
+    setShowSearchResults(results.length > 0);
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    performSearch(query);
+  };
+
+  // Handle search result click
+  const handleSearchResultClick = (service) => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowSearchResults(false);
+    router.push(service.url);
+  };
+
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -58,13 +116,17 @@ export default function Navbar() {
       if (showDropdown && dropdown && !dropdown.contains(event.target) && !button.contains(event.target)) {
         setShowDropdown(false);
       }
+
+      if (showSearchResults && searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
     };
     
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showDropdown]);
+  }, [showDropdown, showSearchResults]);
   
   // Handle logout
   const handleLogout = async () => {
@@ -136,47 +198,119 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             {/* Search Bar */}
             <motion.div
+              ref={searchRef}
               className="relative"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search services..."
-                className="form-input-focus px-4 py-2 rounded-full"
-                style={{
-                  backgroundColor: '#2D2D2D',
-                  color: '#ffffff',
-                  border: '1px solid #FF9933',
-                }}
-                aria-label="Search government services"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-2 text-gray-400 hover:text-white"
-                  style={{ color: '#ffffff' }}
-                  aria-label="Clear search"
-                >
-                  ✕
-                </button>
-              )}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Search services..."
+                  className="form-input-focus px-4 py-2 pr-8 rounded-full w-64"
+                  style={{
+                    backgroundColor: '#2D2D2D',
+                    color: '#ffffff',
+                    border: '1px solid #FF9933',
+                  }}
+                  aria-label="Search government services"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSearchResults([]);
+                      setShowSearchResults(false);
+                    }}
+                    className="absolute right-2 top-2 text-gray-400 hover:text-white"
+                    style={{ color: '#ffffff' }}
+                    aria-label="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              
+              {/* Search Results Dropdown */}
+              <AnimatePresence>
+                {showSearchResults && searchResults.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto"
+                  >
+                    <div className="p-2">
+                      <div className="text-xs text-gray-500 px-3 py-2 border-b">
+                        {searchResults.length} service{searchResults.length !== 1 ? 's' : ''} found
+                      </div>
+                      {searchResults.map((service, index) => (
+                        <motion.div
+                          key={service.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          onClick={() => handleSearchResultClick(service)}
+                          className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg transition-colors"
+                        >
+                          <div 
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg mr-3 flex-shrink-0"
+                            style={{ backgroundColor: service.color }}
+                          >
+                            {service.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium text-gray-900 truncate">
+                                {service.name}
+                              </h4>
+                              {service.popular && (
+                                <span className="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full">
+                                  Popular
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {service.description}
+                            </p>
+                            <div className="flex items-center mt-1">
+                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                {service.category}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-gray-400 ml-2">
+                            →
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {/* No Results Message */}
+              <AnimatePresence>
+                {showSearchResults && searchQuery && searchResults.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                  >
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="text-2xl mb-2">🔍</div>
+                      <p>No services found for "{searchQuery}"</p>
+                      <p className="text-sm mt-1">Try searching for "forms", "schemes", or "emergency"</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
-
-            {/* Language Toggle */}
-            <motion.button
-              onClick={() => setLanguage((lang) => (lang === 'en' ? 'hi' : 'en'))}
-              className="px-3 py-1 rounded-full bg-gray-700 text-sm hover:bg-gray-600 transition-all button-press-effect"
-              style={{ color: '#ffffff' }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={`Switch to ${language === 'en' ? 'Hindi' : 'English'}`}
-            >
-              {language === 'en' ? 'हिंदी' : 'English'}
-            </motion.button>
 
             {/* Desktop Nav Links */}
             <div className="flex items-center space-x-6">
@@ -243,17 +377,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-4">
-            <motion.button
-              onClick={() => setLanguage((lang) => (lang === 'en' ? 'hi' : 'en'))}
-              className="px-2 py-1 rounded-full bg-gray-700 text-xs hover:bg-gray-600 transition-all button-press-effect"
-              style={{ color: '#ffffff' }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={`Switch to ${language === 'en' ? 'Hindi' : 'English'}`}
-            >
-              {language === 'en' ? 'हिंदी' : 'EN'}
-            </motion.button>
+          <div className="md:hidden flex items-center">
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="focus:outline-none"
@@ -287,6 +411,94 @@ export default function Navbar() {
               exit="exit"
             >
               <div className="flex flex-col space-y-4">
+                {/* Mobile Search */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="px-4"
+                >
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      placeholder="Search services..."
+                      className="w-full px-4 py-2 pr-8 rounded-full"
+                      style={{
+                        backgroundColor: '#3D3D3D',
+                        color: '#ffffff',
+                        border: '1px solid #FF9933',
+                      }}
+                      aria-label="Search government services"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSearchResults([]);
+                          setShowSearchResults(false);
+                        }}
+                        className="absolute right-2 top-2 text-gray-400 hover:text-white"
+                        style={{ color: '#ffffff' }}
+                        aria-label="Clear search"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Mobile Search Results */}
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="mt-2 bg-gray-800 rounded-lg">
+                      <div className="text-xs text-gray-400 px-3 py-2 border-b border-gray-700">
+                        {searchResults.length} service{searchResults.length !== 1 ? 's' : ''} found
+                      </div>
+                      {searchResults.map((service) => (
+                        <div
+                          key={service.id}
+                          onClick={() => {
+                            handleSearchResultClick(service);
+                            setIsMenuOpen(false);
+                          }}
+                          className="flex items-center p-3 hover:bg-gray-700 cursor-pointer transition-colors"
+                        >
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm mr-3 flex-shrink-0"
+                            style={{ backgroundColor: service.color }}
+                          >
+                            {service.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium text-white text-sm truncate">
+                                {service.name}
+                              </h4>
+                              {service.popular && (
+                                <span className="bg-orange-600 text-orange-100 text-xs px-1 py-0.5 rounded">
+                                  Popular
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-400 line-clamp-1">
+                              {service.description}
+                            </p>
+                          </div>
+                          <div className="text-gray-400 ml-2">
+                            →
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {showSearchResults && searchQuery && searchResults.length === 0 && (
+                    <div className="mt-2 bg-gray-800 rounded-lg p-4 text-center">
+                      <div className="text-lg mb-1">🔍</div>
+                      <p className="text-gray-400 text-sm">No services found for "{searchQuery}"</p>
+                    </div>
+                  )}
+                </motion.div>
+
                 {navLinks.map((link) => (
                   <motion.div key={link.path} whileHover={{ scale: 1.05, color: '#FF9933' }}>
                     <Link

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {
-    const { query, context = 'scheme' } = await request.json();
+    const { query, context = 'scheme', language = 'english' } = await request.json();
     
     if (!query) {
       return NextResponse.json(
@@ -82,6 +82,27 @@ Focus specifically on information about government schemes in India, including:
         break;
     }
     
+    // Language-specific instructions
+    const languageInstructions = language === 'hindi' 
+      ? `
+IMPORTANT LANGUAGE REQUIREMENT: 
+- आपको पूरा जवाब हिंदी में देना है (Respond completely in Hindi)
+- सभी heading, content, और instructions हिंदी में लिखें
+- Government scheme के नाम अंग्रेजी में हो सकते हैं लेकिन उनकी explanation हिंदी में दें
+- HTML tags का उपयोग करें लेकिन content हिंदी में हो
+
+Example format:
+<h3>प्रधानमंत्री आवास योजना (PMAY)</h3>
+<h4>फायदे:</h4>
+<ul><li>वित्तीय सहायता...</li></ul>
+`
+      : `
+IMPORTANT LANGUAGE REQUIREMENT:
+- Respond completely in English
+- All headings, content, and instructions should be in English
+- Government scheme names can be in Hindi but provide English explanations
+`;
+
     // Construct the prompt for context-aware responses
     const prompt = `
 You are an AI assistant specialized in providing information about Indian government services and schemes.
@@ -89,23 +110,17 @@ Answer the following query in detail, using visually appealing and well-organize
 
 ${contextPrompt}
 
-FORMAT YOUR RESPONSE WITH THE FOLLOWING ELEMENTS:
-1. Use HTML tags to create a visually structured response
-2. Main heading should be in <h3> tags with the scheme name or query topic
-3. Add visual separator elements using <div> tags with appropriate styling
-4. Use <strong> tags for important terms, scheme names, and key points
-5. Create sections with <h4> tags for Benefits, Eligibility, How to Apply, etc.
-6. Use bullet points (<ul><li>) for listing features, benefits, or criteria
-7. Use numbered lists (<ol><li>) for step-by-step instructions
-8. Add a background color to important sections using inline styles (e.g., style="background-color:#f8f8f8;padding:12px;border-radius:8px;border-left:4px solid #138808;")
-9. Highlight important warnings or notes in a special format
-10. Use a proper conclusion section that summarizes key points
+${languageInstructions}
 
-Only provide information about verified government schemes and programs.
-Include eligibility criteria, benefits, and application process if applicable.
-If you don't know the answer or if the query is not relevant to the context, politely say so.
+FORMAT REQUIREMENTS:
+- Use HTML: <h3> for main heading, <h4> for sections (Benefits, Eligibility, How to Apply)
+- Lists: <ul><li> for benefits/features, <ol><li> for steps
+- Emphasis: <strong> for important terms
+- Style sections: style="background-color:#f8f8f8;padding:12px;border-radius:8px;border-left:4px solid #138808;"
+- Include: Benefits, Eligibility, Application Process
+- Be concise but comprehensive
 
-IMPORTANT: Format your response to be easily scannable and visually appealing when rendered as HTML.
+Provide only verified government scheme information.
 
 Query: ${query}
 `;
@@ -130,7 +145,7 @@ Query: ${query}
           }
         ],
         temperature: 0.7,
-        max_tokens: 1000
+        max_tokens: 2500
       }),
     });
 
@@ -146,7 +161,29 @@ Query: ${query}
     const data = await openaiResponse.json();
     const formattedResponse = data.choices[0].message.content;
     
-    return NextResponse.json({ response: formattedResponse });
+    // Check if response was truncated due to token limit
+    const finishReason = data.choices[0].finish_reason;
+    console.log('OpenAI response finish reason:', finishReason);
+    console.log('Response length:', formattedResponse.length);
+    
+    // Add truncation warning if needed
+    let finalResponse = formattedResponse;
+    if (finishReason === 'length') {
+      const truncationWarning = language === 'hindi' 
+        ? '<div style="background-color:#fff3cd;border:1px solid #ffeaa7;border-radius:6px;padding:15px;margin:20px 0;color:#856404;"><strong>नोट:</strong> यह जानकारी अधिक विस्तृत हो सकती है। पूरी जानकारी के लिए संबंधित सरकारी वेबसाइट पर जाएं।</div>'
+        : '<div style="background-color:#fff3cd;border:1px solid #ffeaa7;border-radius:6px;padding:15px;margin:20px 0;color:#856404;"><strong>Note:</strong> This information may be more detailed. For complete details, please visit the relevant government website.</div>';
+      
+      finalResponse += truncationWarning;
+    }
+    
+    return NextResponse.json({ 
+      response: finalResponse,
+      metadata: {
+        finishReason,
+        responseLength: formattedResponse.length,
+        language: language
+      }
+    });
   } catch (error) {
     console.error('Server error:', error);
     return NextResponse.json(

@@ -48,148 +48,154 @@ export default function Services() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {/* Service 1 - Sarkari Sahayak */}
-            <motion.div 
+            <motion.a 
+              href="/services/sarkari-sahayak"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#FF9933]"
+              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', scale: 1.02 }}
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#FF9933] cursor-pointer block group"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-[#FF9933] to-[#FFD699] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform hover:rotate-12">
+              <div className="w-16 h-16 bg-gradient-to-r from-[#FF9933] to-[#FFD699] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform group-hover:rotate-12 group-hover:scale-110">
                 🧾
               </div>
-              <h3 className="text-xl font-bold mb-3">Sarkari Sahayak</h3>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-[#FF9933] transition-colors">Sarkari Sahayak</h3>
               <p className="text-dark-gray mb-6 text-sm">
                 Get simplified summaries of govt schemes (PMAY, PM Kisan, etc.) and steps to apply.
               </p>
               <div className="flex justify-between items-center">
-                <a href="/services/sarkari-sahayak" className="text-[#FF9933] font-medium hover:underline flex items-center">
-                  Try it <span className="ml-1">→</span>
-                </a>
+                <span className="text-[#FF9933] font-medium flex items-center group-hover:underline">
+                  Try it <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </span>
                 <span className="bg-[#FFE8CC] text-[#FF9933] text-xs px-2 py-1 rounded-full">Popular</span>
               </div>
-            </motion.div>
+            </motion.a>
             
             {/* Service 2 - Form Bharna Made Easy */}
-            <motion.div 
+            <motion.a 
+              href="/services/form-bharna-made-easy"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#138808]"
+              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', scale: 1.02 }}
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#138808] cursor-pointer block group"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-[#138808] to-[#8BC34A] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform hover:rotate-12">
+              <div className="w-16 h-16 bg-gradient-to-r from-[#138808] to-[#8BC34A] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform group-hover:rotate-12 group-hover:scale-110">
                 📝
               </div>
-              <h3 className="text-xl font-bold mb-3">Form Bharna Made Easy</h3>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-[#138808] transition-colors">Form Bharna Made Easy</h3>
               <p className="text-dark-gray mb-6 text-sm">
                 AI explains what each field means in ration/passport forms, making complicated forms simple to understand.
               </p>
               <div className="flex justify-between items-center">
-                <a href="/services/form-bharna-made-easy" className="text-[#138808] font-medium hover:underline flex items-center">
-                  Try it <span className="ml-1">→</span>
-                </a>
+                <span className="text-[#138808] font-medium flex items-center group-hover:underline">
+                  Try it <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </span>
                 <span className="bg-[#E8F5E9] text-[#138808] text-xs px-2 py-1 rounded-full">Time Saver</span>
               </div>
-            </motion.div>
+            </motion.a>
             
             {/* Service 3 - Kisan Bot */}
-            <motion.div 
+            <motion.a 
+              href="/services/kisan-bot"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#FF9933]"
+              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', scale: 1.02 }}
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#FF9933] cursor-pointer block group"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-[#FF9933] to-[#FFD699] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform hover:rotate-12">
+              <div className="w-16 h-16 bg-gradient-to-r from-[#FF9933] to-[#FFD699] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform group-hover:rotate-12 group-hover:scale-110">
                 🌾
               </div>
-              <h3 className="text-xl font-bold mb-3">Kisan Bot</h3>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-[#FF9933] transition-colors">Kisan Bot</h3>
               <p className="text-dark-gray mb-6 text-sm">
                 Weather info, mandi prices, and crop suggestions based on your region to help farmers make better decisions.
               </p>
               <div className="flex justify-between items-center">
-                <a href="/services/kisan-bot" className="text-[#FF9933] font-medium hover:underline flex items-center">
-                  Try it <span className="ml-1">→</span>
-                </a>
+                <span className="text-[#FF9933] font-medium flex items-center group-hover:underline">
+                  Try it <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </span>
                 <span className="bg-[#FFE8CC] text-[#FF9933] text-xs px-2 py-1 rounded-full">For Farmers</span>
               </div>
-            </motion.div>
+            </motion.a>
             
             {/* Service 4 - Paise Ki Bachat */}
-            <motion.div 
+            <motion.a 
+              href="/services/paise-ki-bachat"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#138808]"
+              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', scale: 1.02 }}
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#138808] cursor-pointer block group"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-[#138808] to-[#8BC34A] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform hover:rotate-12">
+              <div className="w-16 h-16 bg-gradient-to-r from-[#138808] to-[#8BC34A] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform group-hover:rotate-12 group-hover:scale-110">
                 💰
               </div>
-              <h3 className="text-xl font-bold mb-3">Paise Ki Bachat</h3>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-[#138808] transition-colors">Paise Ki Bachat</h3>
               <p className="text-dark-gray mb-6 text-sm">
                 Weekly tips for saving money, subsidies, and free resources to help you manage your finances better.
               </p>
               <div className="flex justify-between items-center">
-                <a href="/services/paise-ki-bachat" className="text-[#138808] font-medium hover:underline flex items-center">
-                  Try it <span className="ml-1">→</span>
-                </a>
+                <span className="text-[#138808] font-medium flex items-center group-hover:underline">
+                  Try it <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </span>
                 <span className="bg-[#E8F5E9] text-[#138808] text-xs px-2 py-1 rounded-full">Money Saver</span>
               </div>
-            </motion.div>
+            </motion.a>
             
             {/* Service 5 - Suraksha Sahayata */}
-            <motion.div 
+            <motion.a 
+              href="/services/suraksha-sahayata"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#FF9933]"
+              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', scale: 1.02 }}
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#FF9933] cursor-pointer block group"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-[#FF9933] to-[#FFD699] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform hover:rotate-12">
+              <div className="w-16 h-16 bg-gradient-to-r from-[#FF9933] to-[#FFD699] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform group-hover:rotate-12 group-hover:scale-110">
                 🚨
               </div>
-              <h3 className="text-xl font-bold mb-3">Suraksha Sahayata</h3>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-[#FF9933] transition-colors">Suraksha Sahayata</h3>
               <p className="text-dark-gray mb-6 text-sm">
                 Emergency numbers for police, fire, ambulance, and local helplines based on your location.
               </p>
               <div className="flex justify-between items-center">
-                <a href="/services/suraksha-sahayata" className="text-[#FF9933] font-medium hover:underline flex items-center">
-                  Try it <span className="ml-1">→</span>
-                </a>
+                <span className="text-[#FF9933] font-medium flex items-center group-hover:underline">
+                  Try it <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </span>
                 <span className="bg-[#FFE8CC] text-[#FF9933] text-xs px-2 py-1 rounded-full">Life Saver</span>
               </div>
-            </motion.div>
+            </motion.a>
             
             {/* Service 6 - Elderly Care */}
-            <motion.div 
+            <motion.a 
+              href="/services/elderly-care"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#138808]"
+              whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', scale: 1.02 }}
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#138808] cursor-pointer block group"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-[#138808] to-[#8BC34A] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform hover:rotate-12">
+              <div className="w-16 h-16 bg-gradient-to-r from-[#138808] to-[#8BC34A] rounded-full flex items-center justify-center text-white text-3xl mb-4 transform transition-transform group-hover:rotate-12 group-hover:scale-110">
                 👴
               </div>
-              <h3 className="text-xl font-bold mb-3">Elderly Care</h3>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-[#138808] transition-colors">Elderly Care</h3>
               <p className="text-dark-gray mb-6 text-sm">
                 Comprehensive support for senior citizens including healthcare assistance, daily living help, and access to government schemes.
               </p>
               <div className="flex justify-between items-center">
-                <a href="/services/elderly-care" className="text-[#138808] font-medium hover:underline flex items-center">
-                  Try it <span className="ml-1">→</span>
-                </a>
+                <span className="text-[#138808] font-medium flex items-center group-hover:underline">
+                  Try it <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                </span>
                 <span className="bg-[#E8F5E9] text-[#138808] text-xs px-2 py-1 rounded-full">For Seniors</span>
               </div>
-            </motion.div>
+            </motion.a>
           </div>
           
           <motion.div 

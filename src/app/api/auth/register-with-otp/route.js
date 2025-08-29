@@ -102,10 +102,15 @@ export async function POST(request) {
     await otpCollection.deleteOne({ _id: otpRecord._id });
 
     // Prepare user data without sensitive fields
-    const { password: _, _id, ...userWithoutPassword } = newUser;
+    const { password: _, ...userWithoutPassword } = newUser;
 
-    // Generate JWT token
-    const token = generateToken(userWithoutPassword);
+    // Generate JWT token with userId
+    const tokenPayload = {
+      userId: result.insertedId.toString(),
+      email: newUser.email,
+      name: newUser.name
+    };
+    const token = generateToken(tokenPayload);
 
     // Send welcome email (async, don't wait for it)
     sendWelcomeEmail(normalizedEmail, name.trim()).catch(error => {

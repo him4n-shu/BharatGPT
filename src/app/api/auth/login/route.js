@@ -88,10 +88,15 @@ export async function POST(request) {
     }
 
     // Prepare user data without sensitive fields
-    const { password: _, _id, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
-    // Generate JWT token
-    const token = generateToken(userWithoutPassword);
+    // Generate JWT token with userId
+    const tokenPayload = {
+      userId: user._id.toString(),
+      email: user.email,
+      name: user.name
+    };
+    const token = generateToken(tokenPayload);
 
     // Set cookie with token
     const response = NextResponse.json(
