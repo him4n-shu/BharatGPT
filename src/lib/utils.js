@@ -1,4 +1,30 @@
 // Utility functions for various tasks
+
+// Input validation and sanitization
+export function sanitizeInput(input) {
+  if (typeof input !== 'string') return input;
+  
+  return input
+    .trim()
+    .replace(/[<>]/g, '') // Remove potential HTML tags
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+=/gi, '') // Remove event handlers
+    .slice(0, 1000); // Limit length
+}
+
+export function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
+}
+
+export function validatePhoneNumber(phone) {
+  const phoneRegex = /^[+]?[\d\s\-\(\)]{10,15}$/;
+  return phoneRegex.test(phone);
+}
+
+export function validatePassword(password) {
+  return password && password.length >= 8 && password.length <= 128;
+}
 export function formatDate(dateString, locale = 'en-IN') {
   try {
     const date = new Date(dateString);

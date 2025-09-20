@@ -177,8 +177,11 @@ export default function KisanBot() {
       }
       
       const data = await response.json();
-      console.log('API Response data:', data);
-      console.log('Response metadata:', data.metadata);
+      // Debug logging only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('API Response data:', data);
+        console.log('Response metadata:', data.metadata);
+      }
       
       // Add bot response to chat
       const botMessage = {

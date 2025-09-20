@@ -90,64 +90,43 @@ export default function SurakshaSahayata() {
     { name: 'Child Helpline', number: '1098', icon: '👶', description: 'Child protection services' },
   ];
 
-  // Animation variants
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  const slideIn = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 }
-  };
-
-  // Load emergency contacts and location on component mount
-  useEffect(() => {
-    if (session?.user) {
-      loadEmergencyContacts();
-    }
-    // Always try to get location, regardless of login status
-    getCurrentLocation();
-  }, [session, getCurrentLocation, loadEmergencyContacts]);
-
-  // Get address when location changes
-  useEffect(() => {
-    if (location) {
-      getAddressFromCoordinates(location.latitude, location.longitude)
-        .then((address) => {
-          setCurrentAddress(address);
-        })
-        .catch(() => {
-          setCurrentAddress(`${location.latitude}, ${location.longitude}`);
-        });
-    }
-  }, [location, getAddressFromCoordinates]);
-
   // Helper functions
   const getAuthHeaders = useCallback(() => {
-    // Try to get token from localStorage first, then from session
-    let token = null;
+    // For Google OAuth users, we need to create a token from session data
+    if (session?.user) {
+      // Create a simple token payload for Google OAuth users
+      const tokenPayload = {
+        email: session.user.email,
+        name: session.user.name,
+        provider: 'google'
+      };
+      
+      // For Google OAuth users, we'll send user email in a custom header
+      return {
+        'Content-Type': 'application/json',
+        'X-User-Email': session.user.email,
+        'X-User-Name': session.user.name,
+        'X-Auth-Provider': 'google'
+      };
+    }
     
+    // Try to get token from localStorage for traditional auth
+    let token = null;
     if (typeof window !== 'undefined') {
       token = localStorage.getItem('token');
     }
     
-    // If no token in localStorage, try to get from NextAuth session
-    if (!token && session?.accessToken) {
-      token = session.accessToken;
-    }
-    
-    if (!token) {
+    if (token) {
       return {
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       };
     }
     
     return {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
-  }, [session?.accessToken]);
+  }, [session]);
 
   const showMessage = (message, type = 'success') => {
     if (type === 'success') {
@@ -184,6 +163,39 @@ export default function SurakshaSahayata() {
       setIsLoadingContacts(false);
     }
   }, [getAuthHeaders]);
+
+  // Animation variants
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const slideIn = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 }
+  };
+
+  // Load emergency contacts and location on component mount
+  useEffect(() => {
+    if (session?.user) {
+      loadEmergencyContacts();
+    }
+    // Always try to get location, regardless of login status
+    getCurrentLocation();
+  }, [session, getCurrentLocation, loadEmergencyContacts]);
+
+  // Get address when location changes
+  useEffect(() => {
+    if (location) {
+      getAddressFromCoordinates(location.latitude, location.longitude)
+        .then((address) => {
+          setCurrentAddress(address);
+        })
+        .catch(() => {
+          setCurrentAddress(`${location.latitude}, ${location.longitude}`);
+        });
+    }
+  }, [location, getAddressFromCoordinates]);
 
   const addEmergencyContact = async (e) => {
     e.preventDefault();

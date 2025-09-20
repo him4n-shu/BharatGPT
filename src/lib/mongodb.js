@@ -5,7 +5,10 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
-console.log('MongoDB URI prefix:', uri.split('@')[0].split(':')[0]); // Logs only the protocol part for safety
+// Only log connection info in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('MongoDB URI prefix:', uri.split('@')[0].split(':')[0]); // Logs only the protocol part for safety
+}
 
 const options = {
   maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '5'),
@@ -27,7 +30,9 @@ if (!clientPromise) {
     const client = new MongoClient(uri, options);
     clientPromise = client.connect()
       .then(client => {
-        console.log('MongoDB connected successfully');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('MongoDB connected successfully');
+        }
         return client;
       })
       .catch(err => {

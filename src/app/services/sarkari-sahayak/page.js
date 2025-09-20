@@ -253,9 +253,12 @@ export default function SarkariSahayak() {
     // Detect the language of the query (with manual override)
     const autoDetectedLanguage = detectLanguage(currentQuery);
     const detectedLanguage = manualLanguage || autoDetectedLanguage;
-    console.log('Query:', currentQuery);
-    console.log('Auto-detected Language:', autoDetectedLanguage);
-    console.log('Final Language (with manual override):', detectedLanguage);
+    // Debug logging only in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Query:', currentQuery);
+      console.log('Auto-detected Language:', autoDetectedLanguage);
+      console.log('Final Language (with manual override):', detectedLanguage);
+    }
     
     setIsLoading(true);
     setApiResponse(null);
@@ -277,8 +280,11 @@ export default function SarkariSahayak() {
       }
       
       const data = await response.json();
-      console.log('API Response data:', data); // Debug logging
-      console.log('Response metadata:', data.metadata); // Debug metadata
+      // Debug logging only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('API Response data:', data);
+        console.log('Response metadata:', data.metadata);
+      }
       setApiResponse(data.response);
     } catch (error) {
       console.error('Error fetching response:', error);

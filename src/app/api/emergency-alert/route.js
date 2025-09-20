@@ -7,46 +7,65 @@ export async function POST(request) {
   try {
     console.log('Emergency alert API called');
     
-    const authHeader = request.headers.get('authorization');
-    console.log('Auth header present:', !!authHeader);
+    // Check for Google OAuth custom headers first
+    const userEmail = request.headers.get('X-User-Email');
+    const authProvider = request.headers.get('X-Auth-Provider');
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('No authorization token provided');
-      return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    console.log('Token extracted:', !!token);
+    let userId = null;
+    let decoded = null;
+    let finalUserEmail = null;
     
-    let decoded;
-    let userEmail;
-    let userId;
-    
-    try {
-      // Try to decode as our custom JWT first
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Custom JWT decoded successfully:', decoded);
+    if (userEmail && authProvider === 'google') {
+      // Handle Google OAuth users
+      console.log('Google OAuth user detected:', userEmail);
+      finalUserEmail = userEmail;
+    } else {
+      // Handle traditional JWT token authentication
+      const authHeader = request.headers.get('authorization');
+      console.log('Auth header present:', !!authHeader);
       
-      if (decoded.userId) {
-        userId = decoded.userId;
-        userEmail = decoded.email;
-      } else if (decoded.email) {
-        // If no userId but has email, this might be from NextAuth or older token
-        userEmail = decoded.email;
-        console.log('Token has email but no userId, will look up user by email');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('No authorization token provided');
+        return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
       }
-    } catch (error) {
-      console.log('Custom JWT verification failed:', error.message);
+
+      const token = authHeader.split(' ')[1];
+      console.log('Token extracted:', !!token);
       
-      // Try to decode as NextAuth JWT
       try {
-        decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
-        console.log('NextAuth JWT decoded successfully:', decoded);
-        userEmail = decoded.email;
-      } catch (nextAuthError) {
-        console.log('NextAuth JWT verification also failed:', nextAuthError.message);
+        // Try to decode as our custom JWT first
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('Custom JWT decoded successfully:', decoded);
+        
+        if (decoded.userId) {
+          userId = decoded.userId;
+          finalUserEmail = decoded.email;
+        } else if (decoded.email) {
+          // If no userId but has email, this might be from NextAuth or older token
+          finalUserEmail = decoded.email;
+          console.log('Token has email but no userId, will look up user by email');
+        }
+      } catch (error) {
+        console.log('Custom JWT verification failed:', error.message);
+        
+        // Try to decode as NextAuth JWT
+        try {
+          decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+          console.log('NextAuth JWT decoded successfully:', decoded);
+          finalUserEmail = decoded.email;
+        } catch (nextAuthError) {
+          console.log('NextAuth JWT verification also failed:', nextAuthError.message);
+          return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
+      }
+      
+      if (!decoded || !finalUserEmail) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
       }
+    }
+    
+    if (!finalUserEmail) {
+      return NextResponse.json({ error: 'User email not found' }, { status: 401 });
     }
 
     const requestData = await request.json();
@@ -66,12 +85,12 @@ export async function POST(request) {
     if (userId) {
       console.log('Looking for user with ID:', userId);
       user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-    } else if (userEmail) {
-      console.log('Looking for user with email:', userEmail);
-      user = await db.collection('users').findOne({ email: userEmail });
+    } else if (finalUserEmail) {
+      console.log('Looking for user with email:', finalUserEmail);
+      user = await db.collection('users').findOne({ email: finalUserEmail.toLowerCase().trim() });
     } else {
-      console.log('No userId or email found in token');
-      return NextResponse.json({ error: 'Invalid token payload' }, { status: 401 });
+      console.log('No userId or email found');
+      return NextResponse.json({ error: 'Invalid authentication data' }, { status: 401 });
     }
     
     console.log('User found:', !!user);

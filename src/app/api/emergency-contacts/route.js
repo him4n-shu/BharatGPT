@@ -2,45 +2,63 @@ import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
+import { sanitizeInput, validatePhoneNumber } from '@/lib/utils';
 
 export async function GET(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    let decoded;
-    let userEmail;
-    let userId;
+    // Check for Google OAuth custom headers first
+    const userEmail = request.headers.get('X-User-Email');
+    const authProvider = request.headers.get('X-Auth-Provider');
     
-    try {
-      // Try to decode as our custom JWT first
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      if (decoded.userId) {
-        userId = decoded.userId;
-        userEmail = decoded.email;
-      } else if (decoded.email) {
-        userEmail = decoded.email;
+    let userId = null;
+    let decoded = null;
+    let finalUserEmail = null;
+    
+    if (userEmail && authProvider === 'google') {
+      // Handle Google OAuth users
+      finalUserEmail = userEmail;
+    } else {
+      // Handle traditional JWT token authentication
+      const authHeader = request.headers.get('authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
       }
-    } catch (error) {
-      // Try to decode as NextAuth JWT
+
+      const token = authHeader.split(' ')[1];
+      
       try {
-        decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
-        userEmail = decoded.email;
-      } catch (nextAuthError) {
+        // Try to decode as our custom JWT first
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.userId) {
+          userId = decoded.userId;
+          finalUserEmail = decoded.email;
+        }
+      } catch (error) {
+        // Try to decode as NextAuth JWT
+        try {
+          decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+          finalUserEmail = decoded.email;
+        } catch (nextAuthError) {
+          return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
+      }
+      
+      if (!decoded || !finalUserEmail) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
       }
+    }
+
+    if (!finalUserEmail) {
+      return NextResponse.json({ error: 'User email not found' }, { status: 401 });
     }
 
     const client = await clientPromise;
     const db = client.db('bharatgpt');
     
-    // Get user to find their ID if we only have email
+    // Get user to find their ID using email
     let actualUserId = userId;
-    if (!actualUserId && userEmail) {
-      const user = await db.collection('users').findOne({ email: userEmail });
+    if (!actualUserId && finalUserEmail) {
+      const user = await db.collection('users').findOne({ email: finalUserEmail.toLowerCase().trim() });
       if (user) {
         actualUserId = user._id.toString();
       }
@@ -63,33 +81,51 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    let decoded;
-    let userEmail;
-    let userId;
+    // Check for Google OAuth custom headers first
+    const userEmail = request.headers.get('X-User-Email');
+    const authProvider = request.headers.get('X-Auth-Provider');
     
-    try {
-      // Try to decode as our custom JWT first
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      if (decoded.userId) {
-        userId = decoded.userId;
-        userEmail = decoded.email;
-      } else if (decoded.email) {
-        userEmail = decoded.email;
+    let userId = null;
+    let decoded = null;
+    let finalUserEmail = null;
+    
+    if (userEmail && authProvider === 'google') {
+      // Handle Google OAuth users
+      console.log('Google OAuth user detected:', userEmail);
+      finalUserEmail = userEmail;
+    } else {
+      // Handle traditional JWT token authentication
+      const authHeader = request.headers.get('authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
       }
-    } catch (error) {
-      // Try to decode as NextAuth JWT
+
+      const token = authHeader.split(' ')[1];
+      
       try {
-        decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
-        userEmail = decoded.email;
-      } catch (nextAuthError) {
+        // Try to decode as our custom JWT first
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.userId) {
+          userId = decoded.userId;
+          finalUserEmail = decoded.email;
+        }
+      } catch (error) {
+        // Try to decode as NextAuth JWT
+        try {
+          decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+          finalUserEmail = decoded.email;
+        } catch (nextAuthError) {
+          return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
+      }
+      
+      if (!decoded || !finalUserEmail) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
       }
+    }
+    
+    if (!finalUserEmail) {
+      return NextResponse.json({ error: 'User email not found' }, { status: 401 });
     }
 
     const { name, phone, relationship } = await request.json();
@@ -98,19 +134,31 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 });
     }
 
-    // Validate phone number format
-    const phoneRegex = /^[+]?[\d\s\-\(\)]{10,15}$/;
-    if (!phoneRegex.test(phone)) {
+    // Sanitize inputs
+    const sanitizedName = sanitizeInput(name);
+    const sanitizedPhone = sanitizeInput(phone);
+    const sanitizedRelationship = relationship ? sanitizeInput(relationship) : '';
+
+    // Validate inputs
+    if (sanitizedName.length < 2 || sanitizedName.length > 50) {
+      return NextResponse.json({ error: 'Name must be between 2 and 50 characters' }, { status: 400 });
+    }
+
+    if (!validatePhoneNumber(sanitizedPhone)) {
       return NextResponse.json({ error: 'Invalid phone number format' }, { status: 400 });
+    }
+
+    if (sanitizedRelationship && sanitizedRelationship.length > 20) {
+      return NextResponse.json({ error: 'Relationship must be 20 characters or less' }, { status: 400 });
     }
 
     const client = await clientPromise;
     const db = client.db('bharatgpt');
     
-    // Get user to find their ID if we only have email
+    // Get user to find their ID using email
     let actualUserId = userId;
-    if (!actualUserId && userEmail) {
-      const user = await db.collection('users').findOne({ email: userEmail });
+    if (!actualUserId && finalUserEmail) {
+      const user = await db.collection('users').findOne({ email: finalUserEmail.toLowerCase().trim() });
       if (user) {
         actualUserId = user._id.toString();
       }
@@ -130,9 +178,9 @@ export async function POST(request) {
 
     const contact = {
       userId: actualUserId,
-      name: name.trim(),
-      phone: phone.trim(),
-      relationship: relationship ? relationship.trim() : 'Emergency Contact',
+      name: sanitizedName,
+      phone: sanitizedPhone,
+      relationship: sanitizedRelationship || 'Emergency Contact',
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -151,33 +199,50 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    let decoded;
-    let userEmail;
-    let userId;
+    // Check for Google OAuth custom headers first
+    const userEmail = request.headers.get('X-User-Email');
+    const authProvider = request.headers.get('X-Auth-Provider');
     
-    try {
-      // Try to decode as our custom JWT first
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      if (decoded.userId) {
-        userId = decoded.userId;
-        userEmail = decoded.email;
-      } else if (decoded.email) {
-        userEmail = decoded.email;
+    let userId = null;
+    let decoded = null;
+    let finalUserEmail = null;
+    
+    if (userEmail && authProvider === 'google') {
+      // Handle Google OAuth users
+      finalUserEmail = userEmail;
+    } else {
+      // Handle traditional JWT token authentication
+      const authHeader = request.headers.get('authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 });
       }
-    } catch (error) {
-      // Try to decode as NextAuth JWT
+
+      const token = authHeader.split(' ')[1];
+      
       try {
-        decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
-        userEmail = decoded.email;
-      } catch (nextAuthError) {
+        // Try to decode as our custom JWT first
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.userId) {
+          userId = decoded.userId;
+          finalUserEmail = decoded.email;
+        }
+      } catch (error) {
+        // Try to decode as NextAuth JWT
+        try {
+          decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+          finalUserEmail = decoded.email;
+        } catch (nextAuthError) {
+          return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
+      }
+      
+      if (!decoded || !finalUserEmail) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
       }
+    }
+
+    if (!finalUserEmail) {
+      return NextResponse.json({ error: 'User email not found' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -190,10 +255,10 @@ export async function DELETE(request) {
     const client = await clientPromise;
     const db = client.db('bharatgpt');
     
-    // Get user to find their ID if we only have email
+    // Get user to find their ID using email
     let actualUserId = userId;
-    if (!actualUserId && userEmail) {
-      const user = await db.collection('users').findOne({ email: userEmail });
+    if (!actualUserId && finalUserEmail) {
+      const user = await db.collection('users').findOne({ email: finalUserEmail.toLowerCase().trim() });
       if (user) {
         actualUserId = user._id.toString();
       }

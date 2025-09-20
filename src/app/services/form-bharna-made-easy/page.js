@@ -132,9 +132,12 @@ export default function FormBharnaMadeEasy() {
     const autoDetectedLanguage = detectLanguage(queryText);
     const finalLanguage = manualLanguage === 'auto' ? autoDetectedLanguage : manualLanguage;
     
-    console.log('Query text:', queryText);
-    console.log('Auto detected language:', autoDetectedLanguage);
-    console.log('Final language:', finalLanguage);
+    // Debug logging only in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Query text:', queryText);
+      console.log('Auto detected language:', autoDetectedLanguage);
+      console.log('Final language:', finalLanguage);
+    }
     
     setIsLoading(true);
     setApiResponse(null);
@@ -157,8 +160,11 @@ export default function FormBharnaMadeEasy() {
       }
       
       const data = await response.json();
-      console.log('API Response data:', data);
-      console.log('Response metadata:', data.metadata);
+      // Debug logging only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('API Response data:', data);
+        console.log('Response metadata:', data.metadata);
+      }
       setApiResponse(data.response);
     } catch (error) {
       console.error('Error fetching response:', error);
