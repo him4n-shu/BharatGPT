@@ -22,7 +22,17 @@ export default function GoogleSignInButton({
 
       if (result?.error) {
         console.error('Google sign-in error:', result.error);
-        toast.error('Failed to sign in with Google. Please try again.');
+        
+        // Handle specific OAuth errors
+        if (result.error === 'OAuthAccountNotLinked') {
+          toast.error('This account is already linked to another sign-in method. Please use your original sign-in method or contact support.');
+        } else if (result.error === 'OAuthCallback') {
+          toast.error('OAuth authentication failed. Please check your internet connection and try again.');
+        } else if (result.error === 'AccessDenied') {
+          toast.error('Access denied. Please allow the required permissions and try again.');
+        } else {
+          toast.error('Failed to sign in with Google. Please try again.');
+        }
       } else if (result?.ok) {
         // Get the session to access user data
         const session = await getSession();

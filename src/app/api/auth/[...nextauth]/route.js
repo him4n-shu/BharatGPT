@@ -10,7 +10,8 @@ const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  adapter: MongoDBAdapter(clientPromise),
+  // Remove adapter when using JWT strategy to avoid OAuthAccountNotLinked error
+  // adapter: MongoDBAdapter(clientPromise),
   session: {
     strategy: 'jwt',
   },
